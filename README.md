@@ -13,10 +13,10 @@ Nous utilisons deux jeux de données pour analyser la pratique du cyclisme à Pa
      Elles permettent d’observer les tendances de la pratique du vélo, d’identifier les zones à forte affluence et d’évaluer l’impact des infrastructures cyclables.
  - **Nombre d’observations** : 962 340 observations sur 13 mois glissants entre février 2024 et mars 2025
  - **Nombre de variables** : 16 variables incluant :
-   -  Identifiant du compteur.
-   -  Nom du compteur (souvent associé à un lieu précis).
+   -  Identifiant du compteur
+   -  Nom du compteur (souvent associé à un lieu précis)
    - Identifiant du site de comptage
-   - Nom du site de comptage (souvent associé à un lieu précis).
+   - Nom du site de comptage (souvent associé à un lieu précis)
    - Comptage horaire
    - Date et heure de comptage
    - Date d’installation du site de comptage
@@ -29,9 +29,38 @@ Nous utilisons deux jeux de données pour analyser la pratique du cyclisme à Pa
    - url_sites
    - type_dimage
    - mois_annee_comptage
- - **Créateur et éditeur** : Direction de la Voirie et des Déplacements - Ville de Paris.
- - **Format** : CSV.
+ - **Créateur et éditeur** : Direction de la Voirie et des Déplacements - Ville de Paris
+ - **Format** : CSV
  - **Sous-groupes** :
-   - Localisation des compteurs (ex : quais, axes principaux, quartiers résidentiels).
-   - Différenciation des flux (ex : pistes cyclables dédiées vs voies partagées).
-   - Évolution temporelle (ex : analyse par heure, jour, mois, année).
+   - Localisation des compteurs (ex : quais, axes principaux, quartiers résidentiels)
+   - Différenciation des flux (ex : pistes cyclables dédiées vs voies partagées)
+   - Évolution temporelle (ex : analyse par heure, jour, mois, année)
+  
+2. **Disponibilité en temps réel des Vélib’** ([source](https://opendata.paris.fr/explore/dataset/velib-disponibilite-en-temps-reel))
+  - **Origine des données** :
+    Ces données sont fournies par le service Vélib’ Métropole et sont mises à jour en temps réel pour refléter la disponibilité des vélos dans les stations de la capitale et de sa périphérie.
+  - **Pourquoi ces données ?**
+    Elles permettent d’analyser l’usage des vélos en libre-service, d’identifier les déséquilibres entre les stations et de comprendre les comportements des usagers.
+  - **Nombre d’observations** : 1472 observations
+  - **Nombre de variables** :
+    - Identifiant station
+    - Nom station
+    - Station en fonctionnement
+    - Capacité de la station
+    - Nombre bornettes libres
+    - Nombre total vélos disponibles
+    - Vélos mécaniques disponibles
+    - Vélos électriques disponibles
+    - Borne de paiement disponible
+    - Retour vélib possible
+    - Actualisation de la donnée
+    - Coordonnées géographiques
+    - Nom communes équipées
+    - Code INSEE communes équipées
+    - station_opening_hours
+ - **Créateur et éditeur** : Autolib Velib Métropole
+ - **Formats** : CSV
+ - **Sous-groupes** :
+    - Différenciation entre vélos mécaniques et électriques
+    - Quartiers et zones d’activité (ex : zones résidentielles vs zones touristiques)
+    - Stations à forte ou faible demande (ex : gares, bureaux, quartiers résidentiels)
