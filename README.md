@@ -64,3 +64,23 @@ Nous utilisons deux jeux de données pour analyser la pratique du cyclisme à Pa
     - Différenciation entre vélos mécaniques et électriques
     - Quartiers et zones d’activité (ex : zones résidentielles vs zones touristiques)
     - Stations à forte ou faible demande (ex : gares, bureaux, quartiers résidentiels)
+  
+### Plan d’Analyse
+
+Avant de commencer l'analyse, nous nous posons plusieurs questions :
+
+1. **Évolution de la fréquentation cycliste**
+ - Comment évolue le nombre de passages vélo en fonction des jours de la semaine et des heures de la journée ?
+ - Y a-t-il une saisonnalité dans l’usage du vélo à Paris ?
+ - Quels facteurs influencent l’utilisation des Vélib’ (crit’air, grèves, forte pollution, beau temps, bouchons, métro bloqué, JO) ?
+ - Où serait-il intéressant de rajouter des pistes cyclables ?
+2. **Impact des conditions externes**
+ - Quel est l’impact de la météo sur la fréquentation des cyclistes ?
+ - Y a-t-il une corrélation entre la pollution et l’usage du vélo ?
+3. **Analyse des stations Vélib’**
+ - Quels sont les quartiers où la demande de vélos en libre-service est la plus forte ?
+ - Existe-t-il des déséquilibres entre les stations en termes de disponibilité des vélos ?
+4. **Comparaisons et corrélations**
+ - Peut-on observer une relation entre l’utilisation des Vélib’ et les données des compteurs fixes ?
+ - Quels facteurs influencent la répartition et la disponibilité des vélos en libre-service ?
+ - Peut-on observer une relation entre l’utilisation de vélos électriques et la météo.
