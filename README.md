@@ -84,3 +84,11 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
  - Peut-on observer une relation entre l’utilisation des Vélib’ et les données des compteurs fixes ?
  - Quels facteurs influencent la répartition et la disponibilité des vélos en libre-service ?
  - Peut-on observer une relation entre l’utilisation de vélos électriques et la météo.
+
+### Contraintes et Limites
+
+- **Données manquantes ou incomplètes** : Certains compteurs peuvent ne pas fonctionner à certains moments.
+- **Données en temps réel** : La variabilité de la disponibilité des Vélib’ peut compliquer l’analyse rétrospective.
+- **Facteurs externes non pris en compte** : Les grèves, événements exceptionnels ou changements d’infrastructure peuvent impacter les données. De plus les vélos n’ont pas d’identifiants uniques, ce qui nous empêche de déterminer des informations de type distance parcourue ou itinéraire choisi
+
+L’objectif est d’aboutir à une compréhension approfondie de la pratique du cyclisme à Paris à partir de ces jeux de données, tout en identifiant les tendances et les facteurs influençant l’usage du vélo.
