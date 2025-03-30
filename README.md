@@ -77,6 +77,7 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
 2. **Impact des conditions externes**
  - Quel est l’impact de la météo sur la fréquentation des cyclistes ?
  - Y a-t-il une corrélation entre la pollution et l’usage du vélo ?
+ - Les politiques de la Ville de Paris, telles que celles liées aux Jeux Olympiques, aux subventions pour le Pass Navigo ou à l’achat de vélos, influencent-elles l’usage du vélo ?
 3. **Analyse des stations Vélib’**
  - Quels sont les quartiers où la demande de vélos en libre-service est la plus forte ?
  - Existe-t-il des déséquilibres entre les stations en termes de disponibilité des vélos ?
