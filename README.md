@@ -91,4 +91,4 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
 - **Données en temps réel** : La variabilité de la disponibilité des Vélib’ peut compliquer l’analyse rétrospective.
 - **Facteurs externes non pris en compte** : Les grèves, événements exceptionnels ou changements d’infrastructure peuvent impacter les données. De plus les vélos n’ont pas d’identifiants uniques, ce qui nous empêche de déterminer des informations de type distance parcourue ou itinéraire choisi
 
-L’objectif est d’aboutir à une compréhension approfondie de la pratique du cyclisme à Paris à partir de ces jeux de données, tout en identifiant les tendances et les facteurs influençant l’usage du vélo.
+L’objectif est d’aboutir à une compréhension approfondie de la pratique du cyclisme à Paris à partir de ces jeux de données, tout en identifiant les tendances et les facteurs influençant l’usage du vélo, afin de fournir des insights pertinents aux décideurs publics, urbanistes, acteurs de la mobilité durable et citoyens intéressés par l’amélioration des infrastructures cyclables.
