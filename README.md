@@ -75,6 +75,7 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
  - Y a-t-il une saisonnalité dans l’usage du vélo à Paris ?
  - Quels facteurs influencent l’utilisation des Vélib’ (crit’air, grèves, forte pollution, beau temps, bouchons, métro bloqué, JO) ?
  - Où serait-il intéressant de rajouter des pistes cyclables ?
+ - Quelle est la durée moyenne d’un trajet en Vélib’ et comment varie-t-elle selon les quartiers ?
 2. **Impact des conditions externes**
  - Quel est l’impact de la météo sur la fréquentation des cyclistes ?
  - Y a-t-il une corrélation entre la pollution et l’usage du vélo ?
@@ -82,6 +83,8 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
 3. **Analyse des stations Vélib’**
  - Quels sont les quartiers où la demande de vélos en libre-service est la plus forte ? Y a t-il une raison (densité de population, revenus..) ? 
  - Existe-t-il des déséquilibres entre les stations en termes de disponibilité des vélos ?
+ - Quels sont les quartiers nécessitant un ajout d’une station de vélo ?
+ - Existe-t-il des « stations dormantes » où peu de trajets commencent ou finissent ?
 4. **Comparaisons et corrélations**
  - Peut-on observer une relation entre l’utilisation des Vélib’ et les données des compteurs fixes ?
  - Quels facteurs influencent la répartition et la disponibilité des vélos en libre-service ?
