@@ -71,6 +71,7 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
 
 1. **Évolution de la fréquentation cycliste**
  - Comment évolue le nombre de passages vélo en fonction des jours de la semaine et des heures de la journée ?
+ - Peut-on estimer le nombre de trajet domicile-travail par jour ? 
  - Y a-t-il une saisonnalité dans l’usage du vélo à Paris ?
  - Quels facteurs influencent l’utilisation des Vélib’ (crit’air, grèves, forte pollution, beau temps, bouchons, métro bloqué, JO) ?
  - Où serait-il intéressant de rajouter des pistes cyclables ?
@@ -79,12 +80,13 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions :
  - Y a-t-il une corrélation entre la pollution et l’usage du vélo ?
  - Les politiques de la Ville de Paris, telles que celles liées aux Jeux Olympiques, aux subventions pour le Pass Navigo ou à l’achat de vélos, influencent-elles l’usage du vélo ?
 3. **Analyse des stations Vélib’**
- - Quels sont les quartiers où la demande de vélos en libre-service est la plus forte ?
+ - Quels sont les quartiers où la demande de vélos en libre-service est la plus forte ? Y a t-il une raison (densité de population, revenus..) ? 
  - Existe-t-il des déséquilibres entre les stations en termes de disponibilité des vélos ?
 4. **Comparaisons et corrélations**
  - Peut-on observer une relation entre l’utilisation des Vélib’ et les données des compteurs fixes ?
  - Quels facteurs influencent la répartition et la disponibilité des vélos en libre-service ?
- - Peut-on observer une relation entre l’utilisation de vélos électriques et la météo.
+ - Peut-on observer une relation entre l’utilisation de vélos électriques et la météo ?
+ - Est ce les utilisateurs préfèrent les vélos électriques ? Est-ce un bon investissement pour vélib ? Y a t-il des endroits où les vélos électriques sont particulièrement préférés ? 
 
 ### Contraintes et Limites
 
