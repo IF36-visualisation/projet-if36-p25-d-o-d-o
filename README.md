@@ -56,34 +56,34 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
 
 1. Questions exploratoires
     1. Utilisation générale
-        - Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?
-        **Graphique :** Lineplot du nombre de trajet en fonction du temps
+        - Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?\
+        **Graphique :** Lineplot du nombre de trajet en fonction du temps\
         **Variables :** Nombre de trajets, date
-        - Combien de trajets sont effectués en moyenne par jour/mois ?
-        **Graphique :** barplot du nombre de trajets par jour de la semaine, par mois de l’année
+        - Combien de trajets sont effectués en moyenne par jour/mois ?\
+        **Graphique :** barplot du nombre de trajets par jour de la semaine, par mois de l’année\
         **Variables :** Nombre de trajets, date d’emprunt
-        - Quelles stations sont les plus utilisées pour les départs/arrivées ?
-        **Graphique :** Carte avec points de taille différentes pour le nombre de départs/arrivées
+        - Quelles stations sont les plus utilisées pour les départs/arrivées ?\
+        **Graphique :** Carte avec points de taille différentes pour le nombre de départs/arrivées\
         **Variables :** Nom des stations, Nombre de départs/arrivées, Coordonnées des stations
-        - Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ?
-        **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie 
+        - Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ?\
+        **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie\
         **Variables :** Type de vélo, Nombre de trajets par type de vélos
 
 2. Questions explicatives
     1. Lien entre météo et usage
-        - Comment la météo influence-t-elle l’usage des vélos ? (pluie, température, vent, etc…)
-        **Graphique :** Lineplot ou scatterplot par variable météorologique
+        - Comment la météo influence-t-elle l’usage des vélos ? (pluie, température, vent, etc…)\
+        **Graphique :** Lineplot ou scatterplot par variable météorologique\
         **Variables :** Conditions météo, Nombre de trajet par jour
-        - En cas de météo extrême (fortes pluies ou froid extrême), est-ce que le volume de trajets diminue fortement ?
-        **Graphique :** Boxplot (jours normaux vs météo extrême)
+        - En cas de météo extrême (fortes pluies ou froid extrême), est-ce que le volume de trajets diminue fortement ?\
+        **Graphique :** Boxplot (jours normaux vs météo extrême)\
         **Variables :** Conditions météo, nombre de trajets
-        - Quel est l’impact de la neige ou du vent ou de la couverture nuageuse sur la durée moyenne des trajets ?
-        **Graphique :** Lineplot ou scatterplot par variable météorologique
+        - Quel est l’impact de la neige ou du vent ou de la couverture nuageuse sur la durée moyenne des trajets ?\
+        **Graphique :** Lineplot ou scatterplot par variable météorologique\
         **Variables :** Conditions météo, Durée moyenne des trajets
     2. Différences selon les utilisateurs
-        - Les membres abonnés utilisent-ils plus les vélos que les usagers occasionnels quand il fait mauvais ?
-        **Graphique :** Lineplot avec comparaison entre les types d’utilisateur
+        - Les membres abonnés utilisent-ils plus les vélos que les usagers occasionnels quand il fait mauvais ?\
+        **Graphique :** Lineplot avec comparaison entre les types d’utilisateur\
         **Variables :** météo, nombre de trajet, type d’utilisateur
-        - Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?
-        **Graphique :** Lineplot par type d’utilisateur 
+        - Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?\
+        **Graphique :** Lineplot par type d’utilisateur\
         **Variables :** nombre de trajets, type d’utilisateurs, mois
