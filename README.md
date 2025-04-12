@@ -55,7 +55,7 @@ Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre
 Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on peut catégoriser :
 
 1. Questions exploratoires
-    a. Utilisation générale
+    1. Utilisation générale
         - Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?
         **Graphique :** Lineplot du nombre de trajet en fonction du temps
         **Variables :** Nombre de trajets, date
@@ -70,7 +70,7 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         **Variables :** Type de vélo, Nombre de trajets par type de vélos
 
 2. Questions explicatives
-    a. Lien entre météo et usage
+    1. Lien entre météo et usage
         - Comment la météo influence-t-elle l’usage des vélos ? (pluie, température, vent, etc…)
         **Graphique :** Lineplot ou scatterplot par variable météorologique
         **Variables :** Conditions météo, Nombre de trajet par jour
@@ -80,7 +80,7 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         - Quel est l’impact de la neige ou du vent ou de la couverture nuageuse sur la durée moyenne des trajets ?
         **Graphique :** Lineplot ou scatterplot par variable météorologique
         **Variables :** Conditions météo, Durée moyenne des trajets
-    b. Différences selon les utilisateurs
+    2. Différences selon les utilisateurs
         - Les membres abonnés utilisent-ils plus les vélos que les usagers occasionnels quand il fait mauvais ?
         **Graphique :** Lineplot avec comparaison entre les types d’utilisateur
         **Variables :** météo, nombre de trajet, type d’utilisateur
