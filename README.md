@@ -49,6 +49,24 @@ Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre
     - Catégorisation géographique (ex: quartiers)
 
 
+**Emprunts et dépôts des vélos par station** (source :https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv)
+
+- **Nom du dataset :** usage_frequency.csv
+- **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre-service de Washington.
+- **Pourquoi ces données ?** Elles permettent d’avoir le nombre d’emprunt et de dépôt pour chaque station à Washington
+- **Nombre d’observations :** 873 318
+- **Nombre de colonnes :** 4 colonnes incluant **:**
+    - Date
+    - Nom de la station
+    - Nombre d’emprunt sur cette station
+    - Nombre de dépôt sur cette station
+- **Format :** CSV
+- **Sous-groupes** :
+    - Date
+    - Stations : possibilité d’analyser par stations
+    - Activité : Emprunt et dépôt
+    - Utilisation : stations très utilisées et peu utilisées
+
 
 ### Plan d’analyse
 
@@ -68,6 +86,22 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         - Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ?\
         **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie\
         **Variables :** Type de vélo, Nombre de trajets par type de vélos
+        - Quel est le comportement moyen selon le type d’utilisateur (occasionnel ou membre) ?\
+        **Graphique :** Radar chart (potentiellement plusieurs)\
+        **Variables :** moyenne de durée de trajet, distance, heure d’emprunt et de dépôt, date (jour de la semaine), type d’abonnement, type de vélo
+        - Quelles sont les durées moyenne des trajets ? Varient-elles selon le jour de la semaine ou la météo ?\
+        **Graphique :** Boxplot ou violin plot\
+        **Variables :** Durée du trajet, type d’utilisateur, date, condition météo
+    2. Spatio-temporel
+        - Quelles stations sont les plus actives à différentes périodes de la journée (matin ou soir) ?\
+        **Graphique :** Heatmap avec X= heure, Y = station et couleur = nombre de trajets\
+        **Variables :** Heure, Nom de la station, Nombre de trajets
+        - Quelles sont les stations les plus utilisées le week-end, en semaine ?\
+        **Graphique :** Stacked barplot\
+        **Variables :** Jour de la semaine, nom station, nombre de trajets
+        - Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?\
+        **Graphique :** Barplot (différence départ, arrivée)\
+        **Variables :** Nom de la station, Nombre de départs/arrivées
 
 2. Questions explicatives
     1. Lien entre météo et usage
