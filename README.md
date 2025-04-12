@@ -33,7 +33,21 @@ Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre
     - Type d’utilisateur : occasionnel et membre
     - Stations : possibilité d’analyser par station d’origine ou de destination
     - Périodes temporelles : heures, jours, saisons, etc…
+
  
+**Liste des stations de Washington** (source :https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv)
+
+- **Nom du dataset :** station_list.csv
+- **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre-service de Washington.
+- **Pourquoi ces données ?** Elles permettent d’avoir la liste des stations à Washington
+- **Nombre d’observations :** 912 stations différentes
+- **Nombre de colonnes :** 2 colonnes incluant **:**
+    - Nom de la station
+    - Identifiant de la station
+- **Format :** CSV
+- **Sous-groupes** :
+    - Catégorisation géographique (ex: quartiers)
+
 
 
 ### Plan d’analyse
@@ -41,7 +55,19 @@ Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre
 Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on peut catégoriser :
 
 1. Questions exploratoires
-
+    a. Utilisation générale
+        - Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?
+        **Graphique :** Lineplot du nombre de trajet en fonction du temps
+        **Variables :** Nombre de trajets, date
+        - Combien de trajets sont effectués en moyenne par jour/mois ?
+        **Graphique :** barplot du nombre de trajets par jour de la semaine, par mois de l’année
+        **Variables :** Nombre de trajets, date d’emprunt
+        - Quelles stations sont les plus utilisées pour les départs/arrivées ?
+        **Graphique :** Carte avec points de taille différentes pour le nombre de départs/arrivées
+        **Variables :** Nom des stations, Nombre de départs/arrivées, Coordonnées des stations
+        - Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ?
+        **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie 
+        **Variables :** Type de vélo, Nombre de trajets par type de vélos
 
 2. Questions explicatives
     1. Lien entre météo et usage
