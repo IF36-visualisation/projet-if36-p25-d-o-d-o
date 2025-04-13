@@ -67,6 +67,28 @@ Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre
     - Activité : Emprunt et dépôt
     - Utilisation : stations très utilisées et peu utilisées
 
+**Météo (source :** https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=weather.csv)
+
+- **Nom du dataset :** weather.csv
+- **Origine des données** : Ces données proviennent de l’entreprise Visual Crossing qui est un service de météo de Virginia aux Etats Unis.
+- **Pourquoi ces données ?** Elles permettent d’obtenir la météo de chaque jour afin de pouvoir croiser ces données avec l’utilisation des vélos à Washington
+- **Nombre d’observations :** 1584, une pour chaque jour entre mai 2020 et août 2024
+- **Nombre de colonnes :** 32 colonnes dont 7 que nous allons utiliser **:**
+    - Date (”*datetime”*)
+    - Moyenne de température sur la journée (”*temp*”)
+    - Moyenne de température ressentie sur la journée (”*feelslike*”)
+    - Précipitations (”*precip*”) : quantité de liquide tombé / prévu dans la période
+    - Epaisseur de neige au sol (”*snowdepth*”)
+    - Couverture nuageuse (”*cloudcover*”) : entre 0 et 100%
+    - Vitesse du vent (”*windspeed*”) : vitesse moyenne du vent soutenu, mesurée comme la vitesse moyenne du vent survenant au cours de la à deux minutes précédentes
+- **Créateur et éditeur** : Visual Crossing (fournisseur de données météorologiques)
+- **Format :** CSV
+- **Sous-groupes** :
+    - Conditions météorologiques : pluie, neige, vent, etc…
+    - Températures : froid, tempéré, chaud
+    - Saisons : printemps, été, automne, hiver
+    - Jours : semaine ou week-end
+
 
 ### Plan d’analyse
 
@@ -92,6 +114,9 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         - Quelles sont les durées moyenne des trajets ? Varient-elles selon le jour de la semaine ou la météo ?\
         **Graphique :** Boxplot ou violin plot\
         **Variables :** Durée du trajet, type d’utilisateur, date, condition météo
+        - Les vélos électriques sont-ils plus prisés pendant les heures de pointe ?\
+        **Graphique :** Bar plot des différents types de vélo\
+        **Variables :**  Type du vélo, Date
     2. Spatio-temporel
         - Quelles stations sont les plus actives à différentes périodes de la journée (matin ou soir) ?\
         **Graphique :** Heatmap avec X= heure, Y = station et couleur = nombre de trajets\
@@ -102,6 +127,9 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         - Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?\
         **Graphique :** Barplot (différence départ, arrivée)\
         **Variables :** Nom de la station, Nombre de départs/arrivées
+        - Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée) ?\
+        **Graphique :** Barplot (top 10 des paires de stations les plus fréquentées)\
+        **Variables :** Nom de la station de départ, Nom de la station d’arrivée, Nombre de trajets
 
 2. Questions explicatives
     1. Lien entre météo et usage
@@ -121,3 +149,16 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         - Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?\
         **Graphique :** Lineplot par type d’utilisateur\
         **Variables :** nombre de trajets, type d’utilisateurs, mois
+    3. Temporalité
+        - En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?\
+        **Graphique :** Lineplot (heure en abscisse et nombre de trajets en ordonnée)\
+        **Variables :** nombre de trajets, heure
+    4. Évènements
+        - Est ce qu’il est possible de voir une différence d’utilisation des vélos lors de la prise du Capitol le 6 janvier 2021?
+
+### Contraintes et limites :
+- **Données agrégées** : L'absence d’identifiant unique pour chaque vélo limite les possibilités de reconstitution précise des itinéraires ou des distances parcourues.
+- **Données contextuelles limitées** : Les événements exceptionnels (grèves, manifestations, travaux, etc.) ou les changements d’infrastructure (nouvelles pistes cyclables, réaménagements urbains) ne sont pas pris en compte dans les données disponibles.
+- **Intention de l’usager** : bien qu’il soit riche en information, les jeux de données ne reflète pas nécessairement les raisons des choix des usagers (par ex: s’il n’y a plus de vélos électriques disponibles, l’usager va être contraint de prendre un vélo classique contre son gré)
+
+L’objectif est d’aboutir à une compréhension approfondie de la pratique du cyclisme à Washington à partir de ces jeux de données, en identifiant les tendances d’usage, les comportements des usagers, et les facteurs (comme la météo ou la localisation des stations) influençant l’utilisation du service. Cette analyse vise à fournir des insights pertinents pour les décideurs publics, les urbanistes, les acteurs de la mobilité durable, ainsi que pour les citoyens investis dans l’amélioration des mobilités douces.
