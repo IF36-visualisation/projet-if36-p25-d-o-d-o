@@ -154,7 +154,9 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
         **Graphique :** Lineplot (heure en abscisse et nombre de trajets en ordonnée)\
         **Variables :** nombre de trajets, heure
     4. Évènements
-        - Est ce qu’il est possible de voir une différence d’utilisation des vélos lors de la prise du Capitol le 6 janvier 2021?
+        - Est ce qu’il est possible de voir une différence d’utilisation des vélos lors de la prise du Capitol le 6 janvier 2021?\
+        **Graphique :** Lineplot (date en abscisse, nombre de trajets en ordonnée, avec mise en évidence du 6 janvier 2021)\
+        **Variables :** Date de début du trajet, Nombre de trajets par jour
 
 ### Contraintes et limites :
 - **Données agrégées** : L'absence d’identifiant unique pour chaque vélo limite les possibilités de reconstitution précise des itinéraires ou des distances parcourues.
