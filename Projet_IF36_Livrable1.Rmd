@@ -95,6 +95,7 @@ avg_rides_per_month %>%
 ```
 
 **Interprétation** :
+
 Le nombre moyen de trajets évolue clairement au rythme des saisons.
 
 L’activité augmente fortement entre avril et septembre, avec un pic en juillet-août où l'on atteint près de 13 000 trajets en moyenne. Cette hausse s’explique sans doute par les vacances estivales et des conditions météorologiques plus favorables.
