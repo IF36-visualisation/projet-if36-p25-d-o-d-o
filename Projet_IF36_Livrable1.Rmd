@@ -15,12 +15,96 @@ library(lubridate);
 require('utils')
 
 #importation du jeu de données
-
+#df <- 
 ```
 
-## Evolution de l'usage des différents types de vélos
+## Question 2
 
-#### Quelle est l'évolution de l'usage des différents type de vélos ?
+### Question 2a : Y a-t-il une variation du nombre de trajets selon les jours de la semaine ?
+
+**Traitement des données pour les questions 2a et 2b** :
+
+Pour cette analyse, nous avons choisi de ne conserver que la variable started_at, qui indique le moment précis où chaque vélo a été emprunté. À partir de cette information temporelle, nous avons dérivé d’autres variables selon les questions que nous souhaitions étudier :
+
+* Pour la question 2a, nous avons utilisé la fonction wday() du package lubridate afin d’extraire le jour de la semaine correspondant à chaque date.
+* Pour la question 2b, nous avons extrait le mois grâce à la fonction month().
+
+Ces transformations nous ont permis de comprendre l’évolution du nombre d’emprunts selon les moments de la semaine ou de l’année.
+
+**Hypothèse** :
+
+Nous imaginons que les utilisateurs empruntent davantage les vélos en semaine (pour se rendre au travail notamment) que le week-end.
+
+**Graphique** :
+```{r}
+# Préparation des données
+avg_rides_per_day <- df %>%
+  transmute(day_of_week = wday(started_at, label = TRUE, abbr = FALSE, week_start = 1), date = as_date(started_at)) %>% # on garde la date et le jour correspondant
+  group_by(date, day_of_week) %>% # un groupe = une date unique avec son jour
+  summarise(daily_count = n(), .groups = "drop") %>%
+  group_by(day_of_week) %>%
+  summarise(avg_per_day = mean(daily_count))
+
+# Visualisation
+avg_rides_per_day %>%
+  ggplot(aes(x = day_of_week, y = avg_per_day)) +  geom_col(fill = "blue") +
+  labs(title = "Nombre moyen de trajets par jour de la semaine",
+       x = "Jour de la semaine",
+       y = "Nombre moyen de trajets") +
+  scale_y_continuous(breaks = seq(6000, 12000, by = 1000)) +
+  coord_cartesian(ylim = c(6000, NA)) + # Limite inférieure à 6000 
+  theme_minimal()
+```
+
+**Interprétation** :
+
+Contrairement à notre hypothèse initiale, les week-ends enregistrent en réalité un nombre très élevé de trajets, en particulier le samedi qui dépasse tous les autres jours de la semaine.
+Cela suggère que l’usage du vélo ne se limite pas à une fonction utilitaire (travail), mais qu’il est aussi très utilisé pour les loisirs.
+Le dimanche reste élevé, presque équivalent aux jours de travail.
+
+En semaine, le nombre de trajets reste relativement stable autour de 10 000 trajets par jour.
+Cependant, on observe une baisse notable le lundi, où la moyenne descend à environ 9 000 trajets.
+Cela peut s’expliquer par le fait que de nombreux commerces, établissements culturels ou services (comme les banques) sont souvent fermés le lundi, ce qui réduit potentiellement le besoin de déplacement.
+
+Cette observation pourrait être affinée par une analyse horaire (Les pics du matin et du soir existent-ils en semaine ?) et une analyse des catégories d'usagers (membres ou occasionnels)
+
+### Question 2b : Y a-t-il une variation du nombre de trajets selon les mois de l’année ?
+
+**Hypothèse** :
+
+Nous supposons que la fréquentation des vélos est plus importante en été, en raison du beau temps, et qu’elle diminue pendant les mois froids et pluvieux.
+
+**Graphique** :
+```{r}
+# Préparation des données
+avg_rides_per_month <- df %>%
+  transmute(months = month(started_at, label = TRUE, abbr = FALSE), date = as_date(started_at)) %>% # on garde la date et le mois correspondant
+  group_by(date, months) %>% # un groupe = une date unique avec son mois
+  summarise(monthly_count = n(), .groups = "drop") %>%
+  group_by(months) %>%
+  summarise(avg_per_month = mean(monthly_count))
+
+# Visualisation
+avg_rides_per_month %>%
+  ggplot(aes(x = months, y = avg_per_month)) +  geom_col(fill = "blue") +
+  labs(title = "Nombre moyen de trajets par mois de l'année",
+       x = "Mois",
+       y = "Nombre moyen de trajets") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Interprétation** :
+Le nombre moyen de trajets évolue clairement au rythme des saisons.
+
+L’activité augmente fortement entre avril et septembre, avec un pic en juillet-août où l'on atteint près de 13 000 trajets en moyenne. Cette hausse s’explique sans doute par les vacances estivales et des conditions météorologiques plus favorables.
+
+À l'inverse, les trajets diminuent nettement en hiver, notamment entre décembre et février, où le nombre moyen redescend autour de 5 000 trajets en décembre. Cette baisse reflète un usage moindre du vélo durant les mois les plus froids de l'année.
+
+
+## Question 4 : Evolution de l'usage des différents types de vélos
+
+**Quelle est l'évolution de l'usage des différents type de vélos ?**
 
 On peut supposer une hausse de l'utilisation de vélos électriques.
 
@@ -43,6 +127,6 @@ ggplot(monthly_usage, aes(x = month, y = nb_trajets, color = rideable_type)) +
   scale_y_continuous(labels = scales::comma)
 ```
 
-#### Interprétation
+**Interprétation**
 
 L'évolution mensuelle du nombre d'utilisations par type de vélos permet de montrer plusieurs tendances intéressantes. On peut tout d'abord voir que les vélos « docked » c'est-à-dire les vélos qui se prennent et rendent à des stations ont été les plus populaires avant 2021 mais ont connu une grosse diminution au profit de vélos « classiques ». Ces vélos peuvent être posés et rendus n'importe où et ne nécessitent pas d'être rattachés à une station. Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilisé avant d'être dépassé par les vélos « électriques » qui ont connu une hausse significative à partir de 2023. Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation. Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
