@@ -407,3 +407,69 @@ L'analyse des stations révèle deux profils d'utilisation distincts. "New Hamps
 
 Les autres stations, comme "5th & K St NW", suivent également un schéma professionnel avec une activité concentrée autour des heures de pointe, reflétant une utilisation principalement liée aux déplacements domicile-travail.
 
+
+### Question 9 : 
+
+**Quelles sont les stations les plus utilisées le week-end, en semaine ? **
+
+Pour cette analyse, nous avons voulu examiner comment l'utilisation des stations varie entre la semaine et le week-end. Cette question est pertinente car elle permet de distinguer les stations principalement utilisées pour les trajets domicile-travail (en semaine) de celles fréquentées pour des activités de loisirs (week-end).
+
+Notre démarche a consisté à transformer les données temporelles pour catégoriser chaque trajet selon qu'il a lieu en semaine ou le week-end. Pour cela, nous avons :
+
+ - Extrait le jour de la semaine à partir de la variable started_at
+ - Créé une variable binaire "type_jour" (Semaine/Week-end)
+ - Agrégé les données par station et par type de jour
+ - Filtré les 10 stations les plus actives pour améliorer la lisibilité
+
+```{r Q9, echo=FALSE, warning=FALSE}
+
+# Extract jour
+df$date <- ymd_hms(df$started_at)
+df$jour_semaine <- wday(df$date, label = TRUE, week_start = 1) # 1 = lundi, 7 = dimanche
+df$type_jour <- ifelse(df$jour_semaine %in% c("Sat", "Sun"), "Week-end", "Semaine")
+
+# Agréger par station et type jour
+df_bar <- df %>%
+  group_by(start_station_name, type_jour) %>%
+  summarise(nb_trajets = n(), .groups = "drop")
+
+# TOP 10 stations
+top_stations2 <- df_bar %>%
+  group_by(start_station_name) %>%
+  summarise(total = sum(nb_trajets)) %>%
+  top_n(10, total) %>%
+  pull(start_station_name)
+
+# Filtre du TOP 10
+df_bar_top <- df_bar %>% filter(start_station_name %in% top_stations2)
+
+# Suppression NA (les autres stations apres filtre)
+df_bar_top <- df_bar_top %>% filter(!is.na(start_station_name))
+
+
+ggplot(df_bar_top, aes(x = reorder(start_station_name, nb_trajets), y = nb_trajets, fill = type_jour)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Stations les plus utilisées : week-end vs semaine",
+       x = "Station", y = "Nombre de trajets", fill = "Jour") +
+  scale_fill_manual(values = c("Week-end" = "#56B4E9", "Semaine" = "#E69F00")) +
+  theme_minimal()
+
+# STACKED BARPLOT Pourcentage
+ggplot(df_bar_top, aes(x = reorder(start_station_name, nb_trajets), y = nb_trajets, fill = type_jour)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  coord_flip() +
+  labs(title = "Stations les plus utilisées en % : week-end vs semaine",
+       x = "Station", y = "Proportion des trajets (%)", fill = "Jour") +
+  scale_fill_manual(values = c("Week-end" = "#56B4E9", "Semaine" = "#E69F00")) +
+  theme_minimal()
+```
+
+**Interprétation**
+
+L'analyse des stations révèle deux profils d'utilisation distincts. "New Hampshire Ave & T St NW", entourée de logements sans parking, génère le plus grand volume total avec des flux pendulaires marqués. "Columbus Circle/Union Station", connectée aux transports, montre une utilisation dominante en semaine (75%) liée aux horaires de travail.
+
+À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, présentent une forte proportion d'utilisation le week-end (40-45%). Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
+
+Les autres stations comme "5th & K St NW" suivent également un schéma professionnel avec une faible utilisation le week-end.
