@@ -171,16 +171,16 @@ L’objectif est d’aboutir à une compréhension approfondie de la pratique du
 
 ### Importation du jeu de données et des librairies
 
-```{r}
+```{r Importation_Packages, echo=FALSE, include=FALSE}
+library(readr)
 library(ggplot2); 
 library(dplyr); 
 library(lubridate);
+require('utils')
 
 ```
 
 ```{r}
-require('utils')
-
 #importation du jeu de données
 #df <- 
 ```
