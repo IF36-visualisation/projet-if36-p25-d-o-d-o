@@ -1,0 +1,48 @@
+# Projet IF36 - Livrable 1
+
+Julien Schieler, Icham Lecorvaisier, Mathis Reslinger, Lila Mortier
+
+## Importation du jeu de données et des librairies
+
+```{r}
+library(ggplot2); 
+library(dplyr); 
+library(lubridate);
+
+```
+
+```{r}
+require('utils')
+
+#importation du jeu de données
+
+```
+
+## Evolution de l'usage des différents types de vélos
+
+#### Quelle est l'évolution de l'usage des différents type de vélos ?
+
+On peut supposer une hausse de l'utilisation de vélos électriques.
+
+```{r}
+
+monthly_usage <- df %>%
+  mutate(month = floor_date(as.Date(started_at), unit = "month")) %>%
+  group_by(month, rideable_type) %>%
+  summarise(nb_trajets = n(), .groups = "drop")
+
+# Lineplot
+ggplot(monthly_usage, aes(x = month, y = nb_trajets, color = rideable_type)) +
+  geom_line(size=1) +
+  labs(
+    title = "Évolution mensuelle du nombre d'utilisations par type de vélo",
+    x = "Mois",
+    y = "Nombre de trajets",
+    color = "Type de vélo"
+  ) +
+  scale_y_continuous(labels = scales::comma)
+```
+
+#### Interprétation
+
+L'évolution mensuelle du nombre d'utilisations par type de vélos permet de montrer plusieurs tendances intéressantes. On peut tout d'abord voir que les vélos « docked » c'est-à-dire les vélos qui se prennent et rendent à des stations ont été les plus populaires avant 2021 mais ont connu une grosse diminution au profit de vélos « classiques ». Ces vélos peuvent être posés et rendus n'importe où et ne nécessitent pas d'être rattachés à une station. Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilisé avant d'être dépassé par les vélos « électriques » qui ont connu une hausse significative à partir de 2023. Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation. Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
