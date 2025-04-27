@@ -298,3 +298,112 @@ ggplot(monthly_usage, aes(x = month, y = nb_trajets, color = rideable_type)) +
 **Interprétation**
 
 L'évolution mensuelle du nombre d'utilisations par type de vélos permet de montrer plusieurs tendances intéressantes. On peut tout d'abord voir que les vélos « docked » c'est-à-dire les vélos qui se prennent et rendent à des stations ont été les plus populaires avant 2021 mais ont connu une grosse diminution au profit de vélos « classiques ». Ces vélos peuvent être posés et rendus n'importe où et ne nécessitent pas d'être rattachés à une station. Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilisé avant d'être dépassé par les vélos « électriques » qui ont connu une hausse significative à partir de 2023. Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation. Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
+
+### Question 8 : 
+
+**Quelles stations sont les plus actives à différentes périodes de la journée ? **
+
+Pour cette analyse, nous avons examiné comment l'activité des stations varie selon les heures de la journée. Cette question est essentielle pour comprendre les cycles d'utilisation quotidiens et optimiser la redistribution des vélos aux moments stratégiques.
+
+Notre démarche a consisté à analyser finement la distribution horaire des départs et des arrivées. Pour cela, nous avons :
+
+ - Extrait l'heure de départ et d'arrivée à partir des variables started_at et ended_at
+ - Agrégé les données par heure et par station pour quantifier le nombre de trajets
+ - Identifié les 20 stations les plus actives pour améliorer la lisibilité
+ - Créé des heatmaps visualisant l'intensité d'utilisation selon l'heure
+ - Filtré la période nocturne (0h-5h) pour mieux faire ressortir les tendances principales
+
+```{r Q8, echo=FALSE, warning=FALSE}
+
+# Extract heure
+df$heure_start <- hour(ymd_hms(df$started_at))
+
+# Agréger par heure et station de départ
+df_heat <- df %>%
+  group_by(start_station_name, heure_start) %>%
+  summarise(nb_trajets = n(), .groups = "drop")
+
+# TOP 20
+top_stations <- df_heat %>% 
+  group_by(start_station_name) %>% 
+  summarise(total = sum(nb_trajets)) %>% 
+  top_n(20, total) %>% pull(start_station_name)
+
+df_heat_top <- df_heat %>% filter(start_station_name %in% top_stations)
+
+# Suppression NA (les autres stations apres filtre)
+df_heat_top <- df_heat_top %>% filter(!is.na(start_station_name))
+
+# Calculer l'ordre des stations par popularité
+station_order <- df_heat_top %>%
+  group_by(start_station_name) %>%
+  summarise(total_trajets = sum(nb_trajets)) %>%
+  arrange(desc(total_trajets)) %>%
+  pull(start_station_name)
+
+df_heat_top <- df_heat_top %>%
+  mutate(start_station_name = factor(start_station_name, levels = station_order))
+
+df_heat_top_filtre <- df_heat_top %>%
+  filter(!(heure_start >= 0 & heure_start <= 5))
+
+# HEATMAP filtre sur 2 a 5h du matin
+ggplot(df_heat_top_filtre, aes(x = heure_start, y = reorder(start_station_name, desc(start_station_name)), fill = nb_trajets)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(title = "Stations de départ les plus actives \n dans la journée",
+       x = "Heure", y = "Station", fill = "Nombre de début de trajets") +
+  theme_minimal()
+
+
+# Extract heure
+df$heure_end <- hour(ymd_hms(df$ended_at))
+
+# Agréger par heure et station de arrivée
+df_heat <- df %>%
+  group_by(end_station_name, heure_end) %>%
+  summarise(nb_trajets = n(), .groups = "drop")
+
+# TOP 20
+top_stations <- df_heat %>% 
+  group_by(end_station_name) %>% 
+  summarise(total = sum(nb_trajets)) %>% 
+  top_n(20, total) %>% pull(end_station_name)
+
+df_heat_top <- df_heat %>% filter(end_station_name %in% top_stations)
+
+# Suppression NA (les autres stations apres filtre)
+df_heat_top <- df_heat_top %>% filter(!is.na(end_station_name))
+
+# Calculer l'ordre des stations par popularité
+station_order <- df_heat_top %>%
+  group_by(end_station_name) %>%
+  summarise(total_trajets = sum(nb_trajets)) %>%
+  arrange(desc(total_trajets)) %>%
+  pull(end_station_name)
+
+df_heat_top <- df_heat_top %>%
+  mutate(end_station_name = factor(end_station_name, levels = station_order))
+
+df_heat_top_filtre <- df_heat_top %>%
+  filter(!(heure_end >= 0 & heure_end <= 5))
+
+# HEATMAP filtre sur 2 a 5h du matin
+ggplot(df_heat_top_filtre, aes(x = heure_end, y = reorder(end_station_name, desc(end_station_name)), fill = nb_trajets)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(title = "Stations d'arrivée les plus actives \n dans la journée",
+       x = "Heure", y = "Station", fill = "Nombre de fin de trajets") +
+  theme_minimal()
+
+```
+**Interprétation**
+
+L'analyse des heatmaps représentant l'activité des stations de départ et d'arrivée en fonction de l'heure de la journée révèle des modèles d'utilisation intéressants. Les stations les plus actives varient en fonction de l'heure, avec des pics d'activité pendant les heures de pointe (7-9h et 16-18h).
+
+L'analyse des stations révèle deux profils d'utilisation distincts. "New Hampshire Ave & T St NW", entourée de logements sans parking, présente un pic d'activité le matin pour les départs et le soir pour les arrivées, caractéristique d'un flux pendulaire marqué. "Columbus Circle/Union Station", connectée aux transports en commun, montre une utilisation dominante aux heures de pointe, liée aux horaires de travail.
+
+À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, connaissent une activité plus étalée sur la journée, avec un pic en milieu de journée. Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
+
+Les autres stations, comme "5th & K St NW", suivent également un schéma professionnel avec une activité concentrée autour des heures de pointe, reflétant une utilisation principalement liée aux déplacements domicile-travail.
+
