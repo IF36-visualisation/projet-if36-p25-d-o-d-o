@@ -182,8 +182,66 @@ require('utils')
 
 ```{r}
 #importation du jeu de données
-#df <- 
+df <- 
+weather <-
 ```
+## Question 1
+
+**Hypothèse** :
+
+En premier lieu, une observation intéressante à faire est d’observer la tendance générale de l’utilisation des vélos  au cours des années étudiées.  Nous pouvons imaginer une corrélation avec la température pour représenter les saisons, et l’utilisation des vélos. 
+
+**Graphique** :
+
+```{r}
+#Préparation des données
+# Nombre trajets par semaine
+df$date <- as.Date(df$started_at)
+
+df_semaine <- df %>%
+  mutate(semaine = floor_date(date, "week", week_start = 1)) %>%
+  group_by(semaine) %>%
+  summarise(nombre_trajets_semaine = sum(n()))
+
+#Température moyenne par semaine
+weather_semaine <- weather %>%#
+  mutate(semaine = floor_date(datetime, "week", week_start = 1)) %>%
+  group_by(semaine) %>%
+  summarise(temp = mean(temp, na.rm = TRUE))
+
+#Facteur d'agrandissement Nombre trajet / Température
+facteur_trajet_temperature <- max(df_semaine$nombre_trajets_semaine, na.rm = TRUE) / max(weather_semaine$temp, na.rm = TRUE)
+
+# Visualisation
+ggplot() +
+  geom_line(data = df_semaine,
+            aes(x = semaine, y = nombre_trajets_semaine),
+            color = "black") +
+  geom_smooth(data = weather_semaine,
+              aes(x = semaine, y = temp * facteur_trajet_temperature),
+              color = "lightcoral",
+              method = "loess",
+              span= 0.2,) +
+  scale_y_continuous(
+    name = "Nombre de trajets",
+    sec.axis = sec_axis(~ . / facteur_trajet_temperature, name = "Température (°C)") ) +
+  labs(title = "Nombre de trajets par semaine et température",
+       x = "Date",
+       subtitle = "Trajets (noir) et température (rouge)") +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    axis.title.y.right = element_text(color = "red")
+  )
+```
+**Interprétation** :
+
+Nous constatons une augmentation au fil des années de l’utilisation des vélos et surtout une cyclicité. Nous observons une corrélation très forte entre la température et l’utilisation des vélos. Les utilisateurs privilégient l’utilisation des vélos lors de températures chaudes. Ainsi, nous pouvons voir que les utilisations majoritaires se font pendant le printemps, l’été et l’automne. 
+
+Certaines semaines ne suivent pas le paterne comme la semaine du 3 janvier 2022. Avec une température moyenne de 0°, l’utilisation du vélo est la plus faible du dataset avec 15 083 utilisations. Ceci peut s’expliquer par une chute de neige tombée le 3 janvier où 17,5 cm sont tombés en une journée. 
+On observe des phénomènes similaires lors de la semaine du 19 décembre 2022, en raison de conditions météorologiques défavorables comprenant des grelons, de la neige et de la pluie. Pendant la semaine du 15 janvier 2024, on observe une chute de température importante, passant de 7°C la semaine précédente à -2,5°C. Cette semaine-là, on enregistre également des grelons, de la neige et de la pluie, ce qui contribue à une utilisation réduite des vélos.
+
+Ces exemples nous amène à nous demander si une corrélation forte peut être associée entre la météo et l’utilisation des vélos.
 
 ### Question 2
 
