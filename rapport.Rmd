@@ -1,3 +1,16 @@
+---
+title: "Analyse de l'utilisation des vélos libre-service à Washington"
+author: "Julien Schieler, Icham Lecorvaisier, Mathis Reslinger, Lila Mortier"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
+```
+
 # Analyse de l’utilisation des vélos libre-service à Washington
 
 Julien Schieler, Icham Lecorvaisier, Mathis Reslinger, Lila Mortier
