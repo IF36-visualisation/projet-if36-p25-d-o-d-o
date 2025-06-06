@@ -1,0 +1,231 @@
+---
+title: "Projet"
+author: "Julien"
+date: "2025-04-23"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Chargement packages
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+```
+
+## Chargement dataset :
+```{r}
+data <- read_csv('dataset/daily_rent_detail.csv')
+```
+
+## Questions :
+
+### Question 2a : Y a-t-il une variation du nombre de trajets selon les jours de la semaine ?
+
+**Prétraitement des données pour les question 2a et 2b** :
+
+Pour cette analyse, nous avons choisi de ne conserver que la variable started_at, qui indique le moment précis où chaque vélo a été emprunté. À partir de cette information temporelle, nous avons dérivé d’autres variables selon les questions que nous souhaitions étudier :
+
+* Pour la question 2a, nous avons utilisé la fonction wday() du package lubridate afin d’extraire le jour de la semaine correspondant à chaque date.
+* Pour la question 2b, nous avons extrait le mois grâce à la fonction month().
+
+Ces transformations nous ont permis de comprendre l’évolution du nombre d’emprunts selon les moments de la semaine ou de l’année.
+
+**Hypothèse** :
+
+Nous imaginons que les utilisateurs empruntent davantage les vélos en semaine (pour se rendre au travail notamment) que le week-end.
+
+**Graphique** :
+```{r}
+# Préparation des données
+avg_rides_per_day <- data %>%
+  transmute(day_of_week = wday(started_at, label = TRUE, abbr = FALSE, week_start = 1), date = as_date(started_at)) %>% # on garde la date et le jour correspondant
+  group_by(date, day_of_week) %>% # un groupe = une date unique avec son jour
+  summarise(daily_count = n(), .groups = "drop") %>%
+  group_by(day_of_week) %>%
+  summarise(avg_per_day = mean(daily_count))
+
+# Visualisation
+avg_rides_per_day %>%
+  ggplot(aes(x = day_of_week, y = avg_per_day)) +  geom_col(fill = "#56B4E9") +
+  labs(title = "Nombre moyen de trajets par jour de la semaine",
+       x = "Jour de la semaine",
+       y = "Nombre moyen de trajets") +
+  scale_y_continuous(breaks = seq(6000, 12000, by = 1000)) +
+  coord_cartesian(ylim = c(6000, NA)) + # Limite inférieure à 6000 
+  theme_minimal()
+```
+
+**Interprétation** :
+
+Contrairement à notre hypothèse initiale, les week-ends enregistrent en réalité un nombre très élevé de trajets, en particulier le samedi qui dépasse tous les autres jours de la semaine.
+Cela suggère que l’usage du vélo ne se limite pas à une fonction utilitaire (travail), mais qu’il est aussi très utilisé pour les loisirs.
+Le dimanche reste élevé, presque équivalent aux jours de travail.
+
+En semaine, le nombre de trajets reste relativement stable autour de 10 000 trajets par jour.
+Cependant, on observe une baisse notable le lundi, où la moyenne descend à environ 9 000 trajets.
+Cela peut s’expliquer par le fait que de nombreux commerces, établissements culturels ou services (comme les banques) sont souvent fermés le lundi, ce qui réduit potentiellement le besoin de déplacement.
+
+Cette observation pourrait être affinée par une analyse horaire (Les pics du matin et du soir existent-ils en semaine ?) et une analyse des catégories d'usagers (membres ou occasionnels)
+
+### Question 2b : Y a-t-il une variation du nombre de trajets selon les mois de l’année ?
+
+**Hypothèse** :
+
+Nous supposons que la fréquentation des vélos est plus importante en été, en raison du beau temps, et qu’elle diminue pendant les mois froids et pluvieux.
+
+**Graphique** :
+```{r}
+# Préparation des données
+avg_rides_per_month <- data %>%
+  transmute(months = month(started_at, label = TRUE, abbr = FALSE), date = as_date(started_at)) %>% # on garde la date et le mois correspondant
+  group_by(date, months) %>% # un groupe = une date unique avec son mois
+  summarise(monthly_count = n(), .groups = "drop") %>%
+  group_by(months) %>%
+  summarise(avg_per_month = mean(monthly_count))
+
+# Visualisation
+avg_rides_per_month %>%
+  ggplot(aes(x = months, y = avg_per_month)) +  geom_col(fill = "#56B4E9") +
+  labs(title = "Nombre moyen de trajets par mois de l'année",
+       x = "Mois",
+       y = "Nombre moyen de trajets") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Interprétation** :
+Le nombre moyen de trajets évolue clairement au rythme des saisons.
+
+L’activité augmente fortement entre avril et septembre, avec un pic en juillet-août où l'on atteint près de 13 000 trajets en moyenne. Cette hausse s’explique sans doute par les vacances estivales et des conditions météorologiques plus favorables.
+
+À l'inverse, les trajets diminuent nettement en hiver, notamment entre décembre et février, où le nombre moyen redescend autour de 5 000 trajets en décembre. Cette baisse reflète un usage moindre du vélo durant les mois les plus froids de l'année.
+
+
+### Question 16 : Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?
+
+**Hypothèse** :
+On peut supposer que les cyclistes occasionnels sont plus sensibles aux conditions météorologiques et aux périodes touristiques. Ainsi, leur fréquence d’utilisation augmenterait significativement pendant les saisons plus favorables comme le printemps et surtout l’été, où le climat est agréable et les activités extérieures sont privilégiées.
+
+À l’inverse, les membres abonnés continueraient à utiliser le service de manière plus stable tout au long de l’année, y compris en automne et en hiver, notamment pour des trajets domicile-travail.
+
+On s’attend donc à observer une variation saisonnière marquée chez les usagers occasionnels, contrairement aux membres réguliers.
+
+**Graphique** :
+```{r}
+# Fonction de transformation mois -> saison
+get_season <- function(month) {
+  case_when(
+    month %in% c(12, 1, 2)  ~ "Hiver",
+    month %in% c(3, 4, 5)   ~ "Printemps",
+    month %in% c(6, 7, 8)   ~ "Été",
+    month %in% c(9, 10, 11) ~ "Automne"
+  )
+}
+
+# Préparation des données avec regroupement par saison
+seasonal_rides <- data %>%
+  transmute(
+    user_type = recode(member_casual,
+                       "casual" = "Occasionnel",
+                       "member" = "Abonné"),
+    month = month(started_at),
+    season = get_season(month)
+  ) %>%
+  count(user_type, season) %>%
+  mutate(season = factor(season, levels = c("Printemps", "Été", "Automne", "Hiver")))
+
+# Visualisation
+ggplot(seasonal_rides, aes(x = season, y = n, group = user_type, color = user_type)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Évolution saisonnière du nombre de trajets selon le type d'utilisateur",
+    x = "Saison",
+    y = "Nombre de trajets",
+    color = "Type d'utilisateur"
+  ) +
+  theme_minimal()
+```
+
+**Interprétation** :
+Ce graphique représente l’évolution saisonnière du nombre de trajets effectués par les abonnés et les usagers occasionnels.
+
+Similarité dans les tendances :
+On remarque que les deux types d’utilisateurs suivent une évolution très similaire au fil des saisons :
+
+* Un pic d’utilisation en été, suivi du printemps,
+* Une baisse à l’automne,
+* Et un minimum en hiver.
+
+Cela suggère que les comportements saisonniers (influencés par la météo, les vacances, etc.) touchent de manière comparable abonnés et occasionnels.
+
+Différence de volume :
+En revanche, le nombre de trajets est systématiquement plus élevé chez les abonnés, quelle que soit la saison :
+
+* En été, ils réalisent environ 3,37 millions de trajets contre 2,5 millions pour les occasionnels.
+* En hiver, bien que l’usage chute pour les deux groupes, les abonnés restent nettement plus actifs (1,5 million vs 0,65 million).
+
+Cela indique qu’il existe une base d’usagers réguliers bien plus importante, qui continue d’utiliser le service toute l’année, même en conditions moins favorables.
+
+### Question 17 : En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?
+
+**Hypothèse** :
+Les utilisateurs abonnés adoptent très probablement des comportements liés à leur routine quotidienne (trajets domicile-travail par exemple). Ils seraient donc plus susceptibles d’utiliser les vélos pendant les heures de pointe, notamment en début de matinée (trajet vers le travail) et en fin de journée (retour).
+
+À l’inverse, les utilisateurs occasionnels ont une utilisation plus flexible et dispersée dans la journée, et leur recours aux vélos ne devrait pas particulièrement se concentrer sur les heures de pointe.
+
+On s’attend donc à observer des pics d’utilisation pendant les heures de pointe uniquement chez les abonnés, tandis que les utilisateurs occasionnels auront une répartition horaire plus homogène au cours de la journée.
+
+**Graphique** :
+```{r}
+# Étape 1 : extraire l'heure et le type d'utilisateur
+rides_user_hours <- data %>%
+  transmute(
+    user_type = member_casual,            # Type d'utilisateur (membre ou occasionnel)
+    hour = hour(started_at)               # Heure de départ
+  ) %>%
+  count(user_type, hour) %>%              # Nombre de trajets par heure et par type
+  group_by(user_type) %>%
+  mutate(prop = n / sum(n)) %>%           # Proportions pour comparer les profils
+  ungroup()
+
+# Visualisation membres
+rides_user_hours %>%
+  filter(user_type == "member") %>%
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col(fill = "steelblue") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Répartition horaire des trajets — Utilisateurs abonnés",
+    x = "Heure de départ",
+    y = "Proportion des trajets"
+  ) +
+  theme_minimal()
+
+# Visualisation occasionnels
+rides_user_hours %>%
+  filter(user_type == "casual") %>%
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col(fill = "darkorange") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Répartition horaire des trajets — Utilisateurs occasionnels",
+    x = "Heure de départ",
+    y = "Proportion des trajets"
+  ) +
+  theme_minimal()
+
+```
+
+**Interprétation** :
+Le graphique montre la répartition horaire des trajets effectués selon le type d’utilisateur (abonné ou occasionnel), en pourcentage du total des trajets de chaque groupe.
+
+On constate que :
+
+Les abonnés présentent des pics très marqués à 8 h (7,1% des trajets) et 17–18 h (10% et 8,9%), ce qui correspond clairement aux heures de pointe traditionnelles. On note aussi une activité significative dès 6 h du matin (2%), ce qui renforce l’idée d’un usage dans le cadre de déplacements domicile-travail.
+
+À l’inverse, les occasionnels ont une distribution plus lissée dans la journée, avec une montée progressive de l'activité à partir de 7 h, avec un pic à 17 h (autour de 9.5%) et un déclin en soirée. Il n’y a pas de véritables heures de pointe, ce qui traduit un usage plus souple et orienté loisir.
+
+Ces résultats confirment que les abonnés sont des usagers réguliers qui utilisent le service dans un cadre professionnel. En revanche, les cyclistes occasionnels exploitent davantage le service en dehors des pics, ce qui reflète une utilisation non contrainte par des horaires fixes.
