@@ -544,3 +544,565 @@ L'analyse des stations révèle deux profils d'utilisation distincts. "New Hamps
 À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, présentent une forte proportion d'utilisation le week-end (40-45%). Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
 
 Les autres stations comme "5th & K St NW" suivent également un schéma professionnel avec une faible utilisation le week-end.
+
+### Question 10 : 
+
+**Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?**
+
+```{r Q10 ,warning=FALSE}
+
+prepare_balance_data <- function(df_usage, top_n = 20) {
+  df_usage %>%
+    group_by(station_name) %>%
+    summarise(
+      total_departures = sum(pickup_counts, na.rm = TRUE),
+      total_arrivals = sum(dropoff_counts, na.rm = TRUE),
+      .groups = 'drop'
+    ) %>%
+    mutate(
+      total_activity = total_departures + total_arrivals,
+      net_difference = total_departures - total_arrivals,
+      percent_imbalance = round(100 * net_difference / total_activity, 1),
+      
+      # Classification du déséquilibre
+      balance_type = case_when(
+        percent_imbalance > 15  ~ "Forte dominance\ndéparts",
+        percent_imbalance > 5   ~ "Dominance\ndéparts", 
+        percent_imbalance < -15 ~ "Forte dominance\narrivées",
+        percent_imbalance < -5  ~ "Dominance\narrivées",
+        TRUE ~ "Équilibré"
+      ),
+      
+      # Direction du déséquilibre pour les couleurs
+      balance_direction = ifelse(net_difference > 0, "Surplus départs", "Surplus arrivées")
+    ) %>%
+    # Filtrer les stations avec activité significative
+    filter(total_activity >= 200) %>%
+    # Sélectionner les plus déséquilibrées
+    arrange(desc(abs(net_difference))) %>%
+    head(top_n) %>%
+    # Réorganiser pour le graphique (du plus déséquilibré au moins)
+    mutate(
+      # Raccourcir les noms longs manuellement si stringr pose problème
+      station_name_short = ifelse(
+        nchar(station_name) > 30,
+        paste0(substr(station_name, 1, 27), "..."),
+        station_name
+      ),
+      station_name_short = factor(station_name_short, 
+                                 levels = station_name_short[order(abs(net_difference))])
+    )
+}
+
+# 2. CRÉATION DU BARPLOT PRINCIPAL ----
+create_balance_barplot <- function(balance_data) {
+  
+  # Palette de couleurs
+  colors <- c("Surplus départs" = "#d73027", "Surplus arrivées" = "#1a9850")
+  
+  ggplot(balance_data, aes(x = reorder(station_name_display, abs(net_difference)), 
+                          y = net_difference, 
+                          fill = balance_direction)) +
+    
+    # Barres principales
+    geom_col(alpha = 0.8, width = 0.7) +
+    
+    # Ligne de référence à zéro
+    geom_hline(yintercept = 0, color = "black", size = 0.5, linetype = "solid") +
+    
+    # Annotations des valeurs sur les barres
+    geom_text(
+      aes(label = paste0(ifelse(net_difference > 0, "+", ""), 
+                        format(net_difference, big.mark = " "))),
+      hjust = ifelse(balance_data$net_difference > 0, -0.1, 1.1),
+      size = 3,
+      color = "black",
+      fontface = "bold"
+    ) +
+    
+    # Retourner le graphique (barres horizontales)
+    coord_flip() +
+    
+    # Échelles et couleurs
+    scale_fill_manual(values = colors, name = "Type de déséquilibre") +
+    scale_y_continuous(
+      labels = function(x) format(x, big.mark = " "),
+      expand = expansion(mult = c(0.15, 0.15))
+    ) +
+    
+    # Thème et mise en forme
+    theme_minimal(base_size = 12) +
+    theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5, margin = margin(b = 15)),
+      plot.subtitle = element_text(size = 12, hjust = 0.5, color = "gray40", margin = margin(b = 20)),
+      plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
+      
+      axis.title.x = element_text(size = 11, face = "bold"),
+      axis.title.y = element_text(size = 11, face = "bold"),
+      axis.text.x = element_text(size = 10),
+      axis.text.y = element_text(size = 9),
+      
+      legend.position = "bottom",
+      legend.title = element_text(size = 10, face = "bold"),
+      legend.text = element_text(size = 9),
+      
+      panel.grid.major.y = element_line(color = "gray90", size = 0.3),
+      panel.grid.minor = element_blank(),
+      panel.grid.major.x = element_line(color = "gray95", size = 0.3),
+      
+      plot.margin = margin(15, 15, 15, 15)
+    ) +
+    
+    # Labels
+    labs(
+      title = "Stations avec le plus fort déséquilibre départs/arrivées",
+      subtitle = "Différence nette entre le nombre de départs et d'arrivées par station",
+      x = "Station",
+      y = "Différence nette (Départs - Arrivées)",
+      caption = paste("Stations avec >200 trajets • Top", nrow(balance_data))
+    )
+}
+
+
+
+# Graphique principal
+main_plot <- create_balance_barplot(station_balance)
+print(main_plot)
+```
+
+**Interprétation**
+
+L'analyse des déséquilibres départs/arrivées révèle une géographie fonctionnelle marquée du système Capital Bikeshare, illustrant parfaitement les flux de mobilité directionnels qui caractérisent la structure urbaine de Washington DC. Cette cartographie des asymétries dévoile deux types de stations aux rôles bien distincts : les stations "sources" génératrices de trajets et les stations "puits" d'attraction.
+
+Les stations à surplus de départs dessinent clairement la carte des quartiers résidentiels et périphériques de la capitale. 11th & Kenyon St NW domine largement avec un excédent de 21 867 départs, suivie de près par Park Rd & Holmead Pl NW (+21 573), toutes deux situées dans les zones résidentielles du Nord-Ouest. Ces stations fonctionnent comme des "gares de départ" matinales où les résidents entament leurs trajets vers le centre-ville, créant un flux sortant massif qui nécessite un réapprovisionnement constant en vélos. L'amplitude de ces déséquilibres, dépassant les 20 000 trajets, témoigne de l'intensité des mouvements pendulaires quotidiens et de l'appropriation du vélo-partage comme solution de premier/dernier kilomètre.
+
+À l'inverse, les stations déficitaires en départs se concentrent dans les zones d'attraction touristique et commerciale, révélant leur statut de destinations privilégiées. Georgetown Harbor / 30th St NW (-16 061) et C & O Canal & Wisconsin Ave NW (-13 901) capturent massivement les arrivées sans générer proportionnellement de départs, confirmant leur rôle de terminus pour les visiteurs découvrant le front de mer historique de Georgetown. Ces stations "puits" accumulent les vélos en fin de parcours touristique, créant un défi logistique 
+
+### Question 11 : 
+
+**Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée) **
+
+```{r Q11_1 ,warning=FALSE}
+# 1. Calculer les trajets les plus fréquents
+top_routes <- df %>%
+  # Filtrer les lignes avec des noms de stations valides
+  filter(!is.na(start_station_name) & !is.na(end_station_name) & 
+         start_station_name != "" & end_station_name != "") %>%
+  
+  # Créer un label pour l'axe des abscisses (trajet)
+  mutate(
+    trajet = paste(start_station_name, "→", end_station_name),
+    # Raccourcir les noms si ils sont trop longs pour l'affichage
+    trajet_court = ifelse(nchar(trajet) > 50, 
+                         paste0(substr(trajet, 1, 47), "..."), 
+                         trajet)
+  )%>%
+  
+  # Grouper par paire de stations et compter les trajets
+  group_by(trajet,trajet_court) %>%
+  summarise(
+    nombre_trajets = n(),
+    .groups = 'drop'
+  ) %>%
+  
+  # Trier par nombre de trajets décroissant
+  arrange(desc(nombre_trajets)) %>%
+  
+  # Garder le top 10
+  head(10) 
+
+# 2. Créer le barplot
+plot_top_routes <- ggplot(top_routes, aes(x = reorder(trajet_court, nombre_trajets), 
+                                         y = nombre_trajets)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  
+  # Centrer les nombres dans les barres
+  geom_text(aes(label = scales::comma(nombre_trajets), 
+                y = nombre_trajets/2),  # Position au centre de la barre
+            hjust = 0.5,  # Centrer horizontalement
+            vjust = 0.5,  # Centrer verticalement
+            size = 3.5, 
+            color = "white",  # Texte blanc pour contraster avec le bleu
+            fontface = "bold") +  # Texte en gras pour plus de lisibilité
+  
+  # Pivoter pour avoir des labels lisibles
+  coord_flip() +
+  
+  # Personnaliser les labels et le titre
+  labs(
+    title = "Top 10 des trajets les plus fréquents",
+    subtitle = "Paires de stations départ → arrivée",
+    x = "Trajet (Station de départ → Station d'arrivée)",
+    y = "Nombre de trajets",
+    caption = paste("Basé sur", scales::comma(nrow(df)), "trajets au total")
+  ) +
+  
+  # Thème propre
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10),
+    panel.grid.minor = element_blank()
+  )
+
+
+# 3. Afficher le graphique
+print(plot_top_routes)
+
+```
+**Interprétation**
+
+Le classement des trajets les plus fréquents révèle un phénomène remarquable : les 10 trajets les plus populaires sont tous des trajets en boucle (même station de départ et d'arrivée), confirmant l'importance de l'usage récréatif et touristique du système Capital Bikeshare. Cette prédominance s'explique par la concentration de ces stations autour des sites emblématiques de Washington D.C., où les utilisateurs privilégient l'exploration locale plutôt que les déplacements utilitaires.
+
+Jefferson Dr & 14th St SW domine largement avec 19 785 trajets, représentant 0,12% du trafic total, suivi de très près par Smithsonian-National Mall avec 18 657 trajets. Ces deux destinations phares du National Mall captent à elles seules près de 38 500 trajets en boucle, démontrant leur statut exceptionnel dans l'écosystème touristique de la capitale. Le groupe suivant se structure autour de trois destinations majeures (4th St & Madison Dr NW, Gravelly Point, Lincoln Memorial) oscillant entre 12 725 et 14 807 trajets, révélant une hiérarchie claire dans l'attractivité des sites patrimoniaux et récréatifs.
+
+Le bas du classement (stations 6 à 10) maintient des volumes substantiels entre 9 785 et 11 777 trajets, confirmant que même les destinations "moins populaires" du top 10 génèrent un trafic récréatif considérable. Cette répartition démontre que Capital Bikeshare a réussi à créer un réseau de loisirs urbains performant, où chaque station fonctionne comme un hub autonome d'exploration locale. La structure tarifaire favorisant les trajets de moins de 45 minutes encourage ces usages en boucle, transformant le système en une véritable plateforme de découverte touristique tout en maintenant un modèle économique viable.
+
+Cette prédominance des trajets en boucle masque cependant une réalité importante des déplacements effectifs. Si nous excluons ces trajets circulaires pour nous concentrer uniquement sur les véritables déplacements d'un point A vers un point B, un paysage très différent émerge
+
+**Top 10 des trajets point-à-point (trajets différents)**
+
+```{r Q11_2,warning=FALSE}
+# 1. Calculer les trajets les plus fréquents
+top_routes <- df %>%
+  # Filtrer les lignes avec des noms de stations valides
+  filter(!is.na(start_station_name) & !is.na(end_station_name) & 
+         start_station_name != "" & end_station_name != "" & end_station_name != start_station_name) %>%
+  
+  # Grouper par paire de stations et compter les trajets
+  group_by(start_station_name, end_station_name) %>%
+  summarise(
+    nombre_trajets = n(),
+    .groups = 'drop'
+  ) %>%
+  
+  # Trier par nombre de trajets décroissant
+  arrange(desc(nombre_trajets)) %>%
+  
+  # Garder le top 10
+  head(10) %>%
+  
+  # Créer un label pour l'axe des abscisses (trajet)
+  mutate(
+    trajet = paste(start_station_name, "→", end_station_name),
+    # Raccourcir les noms si ils sont trop longs pour l'affichage
+    trajet_court = ifelse(nchar(trajet) > 50, 
+                         paste0(substr(trajet, 1, 47), "..."), 
+                         trajet)
+  )
+
+# 2. Créer le barplot
+plot_top_routes <- ggplot(top_routes, aes(x = reorder(trajet_court, nombre_trajets), 
+                                         y = nombre_trajets)) +
+  geom_col(fill = "steelblue", alpha = 0.8) +
+  
+  # Centrer les nombres dans les barres
+  geom_text(aes(label = scales::comma(nombre_trajets), 
+                y = nombre_trajets/2),  # Position au centre de la barre
+            hjust = 0.5,  # Centrer horizontalement
+            vjust = 0.5,  # Centrer verticalement
+            size = 3.5, 
+            color = "white",  # Texte blanc pour contraster avec le bleu
+            fontface = "bold") +  # Texte en gras pour plus de lisibilité
+  
+  # Pivoter pour avoir des labels lisibles
+  coord_flip() +
+  
+  # Personnaliser les labels et le titre
+  labs(
+    title = "Top 10 des trajets les plus fréquents",
+    subtitle = "Paires de stations départ → arrivée",
+    x = "Trajet (Station de départ → Station d'arrivée)",
+    y = "Nombre de trajets",
+    caption = paste("Basé sur", scales::comma(nrow(df)), "trajets au total")
+  ) +
+  
+  # Thème propre
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10),
+    panel.grid.minor = element_blank()
+  )
+
+# 3. Afficher le graphique
+print(plot_top_routes)
+```
+
+**Interprétation**
+
+Le classement des trajets point-à-point révèle un paysage beaucoup plus diversifié que les trajets en boucle, mettant en évidence deux logiques d'usage distinctes : les déplacements utilitaires urbains et les circuits touristiques inter-monuments. Cette analyse dévoile les véritables flux de mobilité du système Capital Bikeshare lorsque les utilisateurs se déplacent effectivement d'un point A vers un point B.
+
+Columbus Circle / Union Station emerge comme un hub de transit majeur, dominant 4 des 10 trajets les plus fréquents avec des connexions bidirectionnelles vers 8th & F St NE (9 603 et 8 206 trajets) et 6th & H St NE (8 697 et 6 578 trajets). Cette prédominance s'explique par le statut de Union Station comme principale gare ferroviaire de Washington, créant un effet d'attraction naturel pour les correspondances multimodales vers les quartiers résidentiels et professionnels du nord-est. Les volumes légèrement asymétriques entre les sens aller-retour suggèrent des patterns de mobilité pendulaire avec des pointes directionnelles selon les heures.
+
+Le triangle touristique Lincoln Memorial - Jefferson Memorial - Jefferson Dr & 14th St SW constitue le second cluster dominant avec 6 trajets représentant plus de 38 000 déplacements cumulés. Le trajet Lincoln Memorial → Jefferson Memorial (8 941 trajets) domine cette catégorie, révélant un circuit patrimonial privilégié par les visiteurs souhaitant relier les deux mémoriaux iconiques en 15-20 minutes de vélo. La réciprocité quasi-parfaite des flux (8 196 et 8 177 trajets entre Lincoln Memorial et Jefferson Dr & 14th St SW) confirme l'existence de parcours touristiques structurés où le vélo devient l'outil optimal pour découvrir l'ensemble monumental de la capitale américaine.
+
+Maintenant que nous avons identifié la nature particulière des trajets en boucle, analysons plus précisément leurs caractéristiques temporelles pour comprendre les comportements d'usage qui les motivent
+
+**Distribution des temps de trajet" (en pourcentages)** \n
+Distribution du temps de trajet pour les trajets ayant le meme point de depart et d'arriver
+https://capitalbikeshare.com/pricing
+
+```{r Q11_3,warning=FALSE}
+
+# 1. Préparer les données des trajets aller-retour
+same_station_duration_data <- df %>%
+  # Filtrer les lignes avec des noms de stations valides
+  filter(!is.na(start_station_name) & !is.na(end_station_name) & 
+         start_station_name != "" & end_station_name != "" &
+         !is.na(started_at) & !is.na(ended_at)) %>%
+  
+  # Calculer la durée du trajet en minutes
+  mutate(
+    duration_minutes = as.numeric(difftime(ended_at, started_at, units = "mins")),
+    is_same_station = (start_station_name == end_station_name)
+  ) %>%
+  
+  # Garder seulement les trajets aller-retour
+  filter(is_same_station == TRUE) %>%
+  
+  # Filtrer les durées aberrantes (entre 1 minute et 8 heures)
+  filter(duration_minutes >= 1 & duration_minutes <= 480)
+
+# 2. Créer les données pour le graphique en ligne (intervalles de 5 minutes)
+line_data <- same_station_duration_data %>%
+  mutate(
+    # Grouper par intervalles de 5 minutes
+    duration_interval = floor(duration_minutes / 5) * 5
+  ) %>%
+  count(duration_interval) %>%
+  mutate(
+    duration_label = paste0(duration_interval, "-", duration_interval + 5, " min"),
+    percentage = round(100 * n / sum(n), 2),
+    cumulative_count = cumsum(n),
+    cumulative_percentage = round(100 * cumulative_count / sum(n), 1)
+  ) %>%
+  # Garder seulement les intervalles avec au moins quelques trajets pour la lisibilité
+  filter(duration_interval <= 150) %>%  # Jusqu'à 150 minutes pour la lisibilité
+  # Garder seulement les intervalles avec au moins quelques trajets pour la lisibilité
+  filter(10<=duration_interval)  # Jusqu'à 150 minutes pour la lisibilité
+
+# 4. Graphique en ligne - Pourcentages
+plot_line_percentage <- ggplot(line_data, aes(x = duration_interval, y = percentage)) +
+  
+  geom_line(color = "darkgreen", size = 1.2) +
+  geom_point(color = "darkgreen", size = 2) +
+  
+  # Zones colorées selon les catégories
+  geom_area(data = filter(line_data, duration_interval <= 45), 
+            aes(x = duration_interval, y = percentage), 
+            fill = "#2E7D32", alpha = 0.3) +
+  geom_area(data = filter(line_data, duration_interval > 45 & duration_interval <= 75), 
+            aes(x = duration_interval, y = percentage), 
+            fill = "#FF9800", alpha = 0.3) +
+  geom_area(data = filter(line_data, duration_interval > 75), 
+            aes(x = duration_interval, y = percentage), 
+            fill = "#D32F2F", alpha = 0.3) +
+  
+  # Remettre la ligne par-dessus
+  geom_line(color = "darkgreen", size = 1.2) +
+  geom_point(color = "darkgreen", size = 2) +
+  
+  # Lignes verticales
+  geom_vline(xintercept = 45, color = "orange", linetype = "dashed", size = 1) +
+  geom_vline(xintercept = 75, color = "red", linetype = "dashed", size = 1) +
+  
+  labs(
+    title = "Distribution des temps de trajet (en pourcentages)",
+    subtitle = "Zones colorées : Vert (≤45min), Orange (45-75min), Rouge (>75min)",
+    x = "Durée (minutes)",
+    y = "Pourcentage des trajets (%)",
+    caption = "Intervalles de 5 minutes"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+print(plot_line_percentage)
+
+# 7. Statistiques pour les points clés
+cat("=== Points clés de la distribution ===\n")
+
+# Trouver les pics de la distribution
+peak_interval <- line_data[which.max(line_data$n), ]
+cat("Pic principal:", peak_interval$duration_interval, "-", peak_interval$duration_interval + 5, 
+    "minutes (", peak_interval$n, "trajets,", peak_interval$percentage, "%)\n")
+
+# Statistiques aux seuils
+seuil_45 <- line_data %>% filter(duration_interval <= 45) %>% summarise(total = sum(percentage))
+seuil_75 <- line_data %>% filter(duration_interval <= 75) %>% summarise(total = sum(percentage))
+
+cat("Trajets ≤ 45min:", round(seuil_45$total, 1), "%\n")
+cat("Trajets ≤ 75min:", round(seuil_75$total, 1), "%\n")
+
+```
+
+**Interprétation**
+
+La distribution des temps de trajet pour les trajets en boucle (même station de départ et d'arrivée) révèle des comportements d'usage particuliers fortement influencés par la structure tarifaire de Capital Bikeshare. On observe une concentration majeure des trajets dans la zone verte (≤45 minutes), correspondant à la période gratuite pour les abonnés journaliers et annuels, ce qui suggère que de nombreux utilisateurs planifient délibérément leurs sorties récréatives, sportives ou touristiques pour rester dans cette fenêtre sans frais supplémentaires.
+
+La diminution progressive dans la zone orange (45-75 minutes) s'explique par l'introduction des frais de 0,05$/minute pour les vélos classiques, incitant les utilisateurs à raccourcir leurs balades ou à accepter un coût modéré pour des activités de loisir plus longues. Cette baisse devient encore plus marquée dans la zone rouge (>75 minutes), où les coûts cumulés deviennent dissuasifs pour la plupart des utilisateurs occasionnels.
+
+Ces trajets en boucle reflètent principalement des usages de loisir, d'exercice physique ou de découverte touristique plutôt que des déplacements utilitaires. L'émergence des vélos électriques depuis 2023, malgré leur coût supérieur (0,10-0,15$/minute), peut expliquer une partie des trajets plus longs car ils permettent d'explorer des distances plus importantes avec moins d'effort, rendant les balades étendues plus accessibles à un public plus large, y compris aux utilisateurs moins sportifs.
+
+Cette distribution globale des temps cache des variations importantes selon les stations. En détaillant la répartition des durées pour chaque station pratiquant des trajets en boucle, nous pouvons identifier des profils d'usage spécifiques
+
+**Répartition détaillée des durées par station**
+
+```{r Q11_4,warning=FALSE}
+
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+
+# 1. Calculer les statistiques avec 3 catégories de durée
+same_station_rides <- df %>%
+  # Filtrer les lignes avec des noms de stations valides
+  filter(!is.na(start_station_name) & !is.na(end_station_name) & 
+         start_station_name != "" & end_station_name != "" &
+         !is.na(started_at) & !is.na(ended_at)) %>%
+  
+  # Calculer la durée du trajet en minutes
+  mutate(
+    duration_minutes = as.numeric(difftime(ended_at, started_at, units = "mins")),
+    is_same_station = (start_station_name == end_station_name)
+  ) %>%
+  
+  # Filtrer les durées aberrantes (moins de 1 min ou plus de 8h)
+  filter(duration_minutes > 1 & duration_minutes < 480) %>%
+  
+  # Garder seulement les trajets aller-retour
+  filter(is_same_station == TRUE) %>%
+  
+  # Grouper par station et calculer les statistiques avec 3 catégories
+  group_by(start_station_name) %>%
+  summarise(
+    nombre_trajets_meme_station = n(),
+    trajets_45min_moins = sum(duration_minutes <= 45),
+    trajets_45min_75min = sum(duration_minutes > 45 & duration_minutes <= 75),
+    trajets_75min_plus = sum(duration_minutes > 75),
+    
+    proportion_45min_moins = round(100 * trajets_45min_moins / n(), 1),
+    proportion_45min_75min = round(100 * trajets_45min_75min / n(), 1),
+    proportion_75min_plus = round(100 * trajets_75min_plus / n(), 1),
+    
+    duree_moyenne_minutes = round(mean(duration_minutes, na.rm = TRUE), 1),
+    .groups = 'drop'
+  ) %>%
+  
+  # Filtrer les stations avec au moins 10 trajets
+  filter(nombre_trajets_meme_station >= 10) %>%
+  
+  # Trier et garder le top 15
+  arrange(desc(nombre_trajets_meme_station)) %>%
+  head(15) %>%
+  
+  # Raccourcir les noms de stations si nécessaire
+  mutate(
+    station_short = ifelse(nchar(start_station_name) > 30, 
+                          paste0(substr(start_station_name, 1, 27), "..."), 
+                          start_station_name),
+    
+    # Créer une catégorie dominante pour la couleur
+    dominant_category = case_when(
+      proportion_45min_moins >= 50 ~ "Majorité ≤45min",
+      proportion_45min_75min >= 40 ~ "Beaucoup 45-75min", 
+      proportion_75min_plus >= 30 ~ "Beaucoup >75min",
+      TRUE ~ "Mixte"
+    ),
+    
+    # Factoriser pour contrôler l'ordre
+    dominant_category = factor(dominant_category, 
+                             levels = c("Majorité ≤45min", "Beaucoup 45-75min", 
+                                       "Beaucoup >75min", "Mixte"))
+  )
+
+# 3. Graphique en barres empilées pour montrer la répartition exacte
+library(tidyr)
+
+# Préparer les données pour le graphique empilé
+stacked_data <- same_station_rides %>%
+  select(station_short, nombre_trajets_meme_station, 
+         trajets_45min_moins, trajets_45min_75min, trajets_75min_plus) %>%
+  pivot_longer(cols = c(trajets_45min_moins, trajets_45min_75min, trajets_75min_plus),
+               names_to = "categorie_duree", 
+               values_to = "nombre_trajets") %>%
+  mutate(
+    categorie_label = case_when(
+      categorie_duree == "trajets_45min_moins" ~ "≤45 min",
+      categorie_duree == "trajets_45min_75min" ~ "45-75 min", 
+      categorie_duree == "trajets_75min_plus" ~ ">75 min"
+    ),
+    categorie_label = factor(categorie_label, levels = c("≤45 min", "45-75 min", ">75 min"))
+  )
+
+plot_stacked <- ggplot(stacked_data, 
+                      aes(x = reorder(station_short, nombre_trajets_meme_station), 
+                          y = nombre_trajets, 
+                          fill = categorie_label)) +
+  
+  geom_col(position = "stack", alpha = 0.8) +
+  
+  coord_flip() +
+  
+  scale_fill_manual(
+    values = c("≤45 min" = "#2E7D32",      # Vert
+               "45-75 min" = "#FF9800",    # Orange  
+               ">75 min" = "#D32F2F")      # Rouge
+  ) +
+  
+  labs(
+    title = "Répartition détaillée des durées par station",
+    subtitle = "Barres empilées montrant la distribution exacte",
+    x = "Station",
+    y = "Nombre de trajets",
+    fill = "Durée du trajet"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    legend.position = "bottom"
+  )
+
+print(plot_stacked)
+
+# 4. Statistiques globales pour les 3 catégories
+cat("=== Analyse des 3 catégories de durée ===\n")
+
+global_stats <- same_station_rides %>%
+  summarise(
+    total_trajets = sum(nombre_trajets_meme_station),
+    total_45min_moins = sum(trajets_45min_moins),
+    total_45min_75min = sum(trajets_45min_75min),
+    total_75min_plus = sum(trajets_75min_plus),
+    
+    prop_45min_moins = round(100 * total_45min_moins / total_trajets, 1),
+    prop_45min_75min = round(100 * total_45min_75min / total_trajets, 1),
+    prop_75min_plus = round(100 * total_75min_plus / total_trajets, 1)
+  )
+
+cat("Total trajets aller-retour:", global_stats$total_trajets, "\n")
+cat("≤45min:", global_stats$total_45min_moins, "(", global_stats$prop_45min_moins, "%)\n")
+cat("45-75min:", global_stats$total_45min_75min, "(", global_stats$prop_45min_75min, "%)\n") 
+cat(">75min:", global_stats$total_75min_plus, "(", global_stats$prop_75min_plus, "%)\n")
+
+
+
+```
+
+**Interprétation**
+
+La répartition des durées de trajets en boucle par station révèle des profils d'usage distincts liés à la vocation géographique et touristique de chaque localisation. Les stations les plus populaires pour les trajets circulaires se concentrent autour de sites emblématiques de Washington D.C., avec Jefferson Dr & 14th St SW et Smithsonian-National Mall en tête, confirmant l'usage majoritairement récréatif et touristique de ce type de trajet.
+
+On observe une prédominance systématique des trajets courts (≤45 minutes, zone verte) dans toutes les stations, reflétant l'influence de la structure tarifaire gratuite pour les abonnés dans cette tranche. Cependant, certaines stations comme Jefferson Dr & 14th St SW, Smithsonian-National Mall, et Gravelly Point présentent des proportions plus importantes de trajets moyens et longs (zones orange et rouge), suggérant que ces emplacements favorisent des activités de loisir plus étendues malgré les coûts supplémentaires.
+
+Les stations situées près de sites naturels ou panoramiques (Gravelly Point, Roosevelt Island, National Harbor Carousel) montrent des durées plus variées, indiquant que les utilisateurs sont disposés à payer des frais additionnels pour profiter pleinement de ses environnements particuliers. À l'inverse, les stations plus urbaines et centrales (15th St & Pennsylvania Ave NW, Jefferson Memorial) présentent une concentration plus marquée dans la zone gratuite, suggérant un usage plus utilitaire ou des contraintes budgétaires plus strictes pour ces localisations.
+
+
+
