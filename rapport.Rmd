@@ -568,6 +568,111 @@ ggplot(df_evolution, aes(x = month, y = nb_trajets, color = member_casual)) +
 On peut voir sur le graphique, qu'il y a de plus en plus de trajets fait par des membres. Il y a donc probablement plus de trajets de membres avec des vélos classiques qu'avec des vélos docked puisqu'il n'y a quasiement plus de vélos docked tandis qu'il y a énormement de vélos classiques en circulation. On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent. Il n'y a pas vraiment de différence d'utilisation. 
 
 
+### Question 6 : Quelles sont les durées moyennes de trajet ? Quels éléments influent sur cette durée ? (jour de la semaine, météo)
+
+**Hypothèse :**
+
+En étudiant les durées moyennes de trajet, on s'attend à ce que le jour de la semaine, et la météo influent. Nous pensons que les durées des trajets sont plus longues le weekend. La météo serait probablement aussi un facteur. La durée moyenne de trajet devrait être plus courte les jours de mauvais temps.
+
+```{r}
+
+df <- df %>%
+  mutate(
+    started_at = ymd_hms(started_at),
+    ended_at = ymd_hms(ended_at),
+    ride_duration = as.numeric(difftime(ended_at, started_at, units = "mins")),
+    date = as.Date(started_at)
+  ) 
+  
+
+daily_avg <- df %>%
+  filter(ride_duration > 0 & ride_duration < 1440)%>%
+  group_by(date) %>%
+  summarise(mean_duration = mean(ride_duration, na.rm = TRUE))
+
+
+weather <- weather %>%
+  mutate(datetime = as.Date(datetime))
+
+merged <- daily_avg %>%
+  left_join(weather, by = c("date" = "datetime"))
+
+```
+
+```{r}
+
+df %>%
+  mutate(day_of_week = wday(started_at, label = TRUE)) %>%
+  group_by(day_of_week) %>%
+  summarise(mean_duration = mean(ride_duration)) %>%
+  
+  ggplot(aes(x = day_of_week, y = mean_duration)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = "Durée moyenne des trajets par jour de la semaine",
+    x = "Jour",
+    y = "Durée moyenne (min)"
+  ) +
+  theme_minimal()
+
+merged %>%
+  ggplot(aes(x = temp, y = mean_duration)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE, color = "red") +
+  labs(
+    title = "Durée moyenne des trajets selon la température",
+    x = "Température moyenne (°C)",
+    y = "Durée moyenne (min)"
+  ) +
+  theme_minimal()
+
+
+merged %>%
+  ggplot(aes(x = cloudcover, y = mean_duration)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "loess", color = "blue", se = FALSE) +
+  labs(
+    title = "Durée moyenne selon la couverture nuageuse",
+    x = "Couverture nuageuse (%)",
+    y = "Durée moyenne (min)"
+  ) +
+  theme_minimal()
+
+
+merged %>%
+  ggplot(aes(x = precip, y = mean_duration)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "loess", color = "blue", se = FALSE) +
+  labs(
+    title = "Durée moyenne selon les précipitations",
+    x = "Précipitations (mm)",
+    y = "Durée moyenne (min)"
+  ) +
+  theme_minimal()
+
+
+merged %>%
+  ggplot(aes(x = windspeed, y = mean_duration)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "loess", color = "blue", se = FALSE) +
+  labs(
+    title = "Durée moyenne selon la vitesse du vent",
+    x = "Vitesse du vent",
+    y = "Durée moyenne (min)"
+  ) +
+  theme_minimal()
+
+
+```
+
+**Interprétation** :
+
+On peut voir dans un premier temps, que la moyenne de trajet la semaine est d'environ 17 minutes tandis que celle durant le weekend est nettement plus élevée avec 25 minutes. Cela confirme donc nos attentes. Cela s'explique sûrement par l'utilisation différente des vélos : les gens les utilisent le weekend afin de se promener pour le loisir, tandis que durant la semaine, les utilisateurs s'en servent pour des trajet domicile-travail majoritairement.
+
+Ensuite, concernant la météo, on peut voir que les durées moyennes maximum sont atteintes vers 20-25 degrés de température, vers 20km/h de vent et quand il ne pleut pas.Cela signifie que les utilisateurs évitent de faire des grands trajets quand les conditions ne sont pas optimales. 
+
+
+
 ### Question 8 : 
 
 **Quelles stations sont les plus actives à différentes périodes de la journée ? **
@@ -1303,4 +1408,67 @@ On observe une prédominance systématique des trajets courts (≤45 minutes, zo
 Les stations situées près de sites naturels ou panoramiques (Gravelly Point, Roosevelt Island, National Harbor Carousel) montrent des durées plus variées, indiquant que les utilisateurs sont disposés à payer des frais additionnels pour profiter pleinement de ses environnements particuliers. À l'inverse, les stations plus urbaines et centrales (15th St & Pennsylvania Ave NW, Jefferson Memorial) présentent une concentration plus marquée dans la zone gratuite, suggérant un usage plus utilitaire ou des contraintes budgétaires plus strictes pour ces localisations.
 
 
+### Question 15 : Les utilisateurs membres utilisent-ils plus les vélos par mauvais temps ?
+
+**Hypothèse**
+
+On se demande si les utilisateurs membres utilisent plus les vélos par mauvais temps. Nous aurions tendance à dire que oui, que les utilisateurs casual les utilisent pendant des périodes de beau temps pour faire des balades tandis que les utilisateurs membre les utilisent pour se déplacer quotidiennement, ce qui peut inclure davantage de trajets sous le mauvais temps.
+
+```{r}
+
+df <- df %>%
+  mutate(
+    date = as.Date(started_at),
+    member_casual = as.factor(member_casual)
+  )
+
+weather <- weather %>%
+  mutate(
+    date = as.Date(datetime),
+    bad_weather = precip > 1 | windspeed > 25
+  )
+
+daily_counts <- df %>%
+  group_by(date, member_casual) %>%
+  summarise(n_trips = n(), .groups = "drop")
+
+
+merged <- daily_counts %>%
+  left_join(weather, by = "date")
+
+merged %>%
+  group_by(bad_weather, member_casual) %>%
+  summarise(mean_rides = mean(n_trips), .groups = "drop") %>%
+  ggplot(aes(x = bad_weather, y = mean_rides, fill = member_casual)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Utilisation moyenne selon météo",
+    x = "Météo mauvaise",
+    y = "Nombre moyen de trajets",
+    fill = "Type d'utilisateur"
+  ) +
+  theme_minimal()
+
+
+merged %>%
+  group_by(member_casual, bad_weather) %>%
+  summarise(total = sum(n_trips), .groups = "drop") %>%
+  group_by(member_casual) %>%
+  mutate(share = total / sum(total) * 100) %>%
+  ggplot(aes(x = member_casual, y = share, fill = bad_weather)) +
+  geom_col(position = "stack") +
+  labs(
+    title = "Part des trajets en mauvais temps",
+    x = "Type d'utilisateur",
+    y = "Pourcentage des trajets",
+    fill = "Mauvais temps"
+  ) +
+  theme_minimal()
+
+```
+
+**Interprétation**
+
+Sur ce graphique, nous avons représenté les jours de mauvais temps par les jours où il y a soit plus de 1mm de précipitation soit plus de 25km/h de vent. \
+On peut voir que contrairement à nos hypothèses que le mauvais temps affecte quasiement autant les utilisateurs réguliers que les utilisateurs occasionnels. On peut voir également que finalement, les utilisateurs en règle générale ne sont pas très affectés par la météo, environ 45% des trajets sont réalisés sous mauvais temps.
 
