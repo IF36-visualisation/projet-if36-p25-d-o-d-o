@@ -5,6 +5,9 @@ output:
   prettydoc::html_pretty:
     theme: architect
     highlight: github
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 ```{r setup, include=FALSE}
@@ -21,164 +24,162 @@ Julien Schieler, Icham Lecorvaisier, Mathis Reslinger, Lila Mortier
 
 Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre-service à Washington :
 
-**Information sur les locations de vélos** (source :https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv)
+**Information sur les locations de vélos** (source :<https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv>)
 
-- **Nom du dataset :** daily_rent_detail.csv
-- **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre service de Washington.
-- **Pourquoi ces données ?** Elles permettent d’observer l’utilisation de ces vélos, en analysant les dates et heures d’utilisation, les lieux d’emprunt et de dépôt notamment.
-- **Nombre d’observations** : 16 086 673
-- **Nombre de colonnes** : 13 colonnes incluant :
-    - Identifiant du trajet (”ride_id”)
-    - Type du vélo (”rideable type”) : vélo classique, électrique, autre (cargo)
-    - Date et heure de l’emprunt (”started_at”)
-    - Date et heure du retour (”ended_at”)
-    - Nom de la station de départ (”start_station_name”)
-    - Identifiant de la station de départ (”start_station_id)
-    - Nom de la station d’arrivée (”end_station_name”)
-    - Identifiant de la station d’arrivée (”end_station_id”)
-    - Latitude de départ (”start_lat”)
-    - Longitude de départ (”start_lng”)
-    - Latitude d’arrivée (”end_lat”)
-    - Longitude d’arrivée (”end_lng”)
-    - Type d’abonnement du client (”member_casual”) : utilisateur en abonnement casual ou membre.
-- **Créateur et éditeur** : Entreprise Capital Bike Share
-- **Format** : CSV
-- **Sous-groupes** :
-    - Type de vélo : vélo classique, électrique et cargo
-    - Type d’utilisateur : occasionnel et membre
-    - Stations : possibilité d’analyser par station d’origine ou de destination
-    - Périodes temporelles : heures, jours, saisons, etc…
+-   **Nom du dataset :** daily_rent_detail.csv
+-   **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre service de Washington.
+-   **Pourquoi ces données ?** Elles permettent d’observer l’utilisation de ces vélos, en analysant les dates et heures d’utilisation, les lieux d’emprunt et de dépôt notamment.
+-   **Nombre d’observations** : 16 086 673
+-   **Nombre de colonnes** : 13 colonnes incluant :
+    -   Identifiant du trajet (”ride_id”)
+    -   Type du vélo (”rideable type”) : vélo classique, électrique, autre (cargo)
+    -   Date et heure de l’emprunt (”started_at”)
+    -   Date et heure du retour (”ended_at”)
+    -   Nom de la station de départ (”start_station_name”)
+    -   Identifiant de la station de départ (”start_station_id)
+    -   Nom de la station d’arrivée (”end_station_name”)
+    -   Identifiant de la station d’arrivée (”end_station_id”)
+    -   Latitude de départ (”start_lat”)
+    -   Longitude de départ (”start_lng”)
+    -   Latitude d’arrivée (”end_lat”)
+    -   Longitude d’arrivée (”end_lng”)
+    -   Type d’abonnement du client (”member_casual”) : utilisateur en abonnement casual ou membre.
+-   **Créateur et éditeur** : Entreprise Capital Bike Share
+-   **Format** : CSV
+-   **Sous-groupes** :
+    -   Type de vélo : vélo classique, électrique et cargo
+    -   Type d’utilisateur : occasionnel et membre
+    -   Stations : possibilité d’analyser par station d’origine ou de destination
+    -   Périodes temporelles : heures, jours, saisons, etc…
 
- 
-**Liste des stations de Washington** (source :https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv)
+**Liste des stations de Washington** (source :<https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv>)
 
-- **Nom du dataset :** station_list.csv
-- **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre-service de Washington.
-- **Pourquoi ces données ?** Elles permettent d’avoir la liste des stations à Washington
-- **Nombre d’observations :** 912 stations différentes
-- **Nombre de colonnes :** 2 colonnes incluant **:**
-    - Nom de la station
-    - Identifiant de la station
-- **Format :** CSV
-- **Sous-groupes** :
-    - Catégorisation géographique (ex: quartiers)
+-   **Nom du dataset :** station_list.csv
+-   **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre-service de Washington.
+-   **Pourquoi ces données ?** Elles permettent d’avoir la liste des stations à Washington
+-   **Nombre d’observations :** 912 stations différentes
+-   **Nombre de colonnes :** 2 colonnes incluant **:**
+    -   Nom de la station
+    -   Identifiant de la station
+-   **Format :** CSV
+-   **Sous-groupes** :
+    -   Catégorisation géographique (ex: quartiers)
 
+**Emprunts et dépôts des vélos par station** (source :<https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv>)
 
-**Emprunts et dépôts des vélos par station** (source :https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=station_list.csv)
+-   **Nom du dataset :** usage_frequency.csv
+-   **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre-service de Washington.
+-   **Pourquoi ces données ?** Elles permettent d’avoir le nombre d’emprunt et de dépôt pour chaque station à Washington
+-   **Nombre d’observations :** 873 318
+-   **Nombre de colonnes :** 4 colonnes incluant **:**
+    -   Date
+    -   Nom de la station
+    -   Nombre d’emprunt sur cette station
+    -   Nombre de dépôt sur cette station
+-   **Format :** CSV
+-   **Sous-groupes** :
+    -   Date
+    -   Stations : possibilité d’analyser par stations
+    -   Activité : Emprunt et dépôt
+    -   Utilisation : stations très utilisées et peu utilisées
 
-- **Nom du dataset :** usage_frequency.csv
-- **Origine des données** : Ces données proviennent de l’entreprise Capital Bike Share, l’entreprise de location de vélos libre-service de Washington.
-- **Pourquoi ces données ?** Elles permettent d’avoir le nombre d’emprunt et de dépôt pour chaque station à Washington
-- **Nombre d’observations :** 873 318
-- **Nombre de colonnes :** 4 colonnes incluant **:**
-    - Date
-    - Nom de la station
-    - Nombre d’emprunt sur cette station
-    - Nombre de dépôt sur cette station
-- **Format :** CSV
-- **Sous-groupes** :
-    - Date
-    - Stations : possibilité d’analyser par stations
-    - Activité : Emprunt et dépôt
-    - Utilisation : stations très utilisées et peu utilisées
+**Météo (source :** <https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=weather.csv>)
 
-**Météo (source :** https://www.kaggle.com/datasets/taweilo/capital-bikeshare-dataset-202005202408?select=weather.csv)
-
-- **Nom du dataset :** weather.csv
-- **Origine des données** : Ces données proviennent de l’entreprise Visual Crossing qui est un service de météo de Virginia aux Etats Unis.
-- **Pourquoi ces données ?** Elles permettent d’obtenir la météo de chaque jour afin de pouvoir croiser ces données avec l’utilisation des vélos à Washington
-- **Nombre d’observations :** 1584, une pour chaque jour entre mai 2020 et août 2024
-- **Nombre de colonnes :** 32 colonnes dont 7 que nous allons utiliser **:**
-    - Date (”*datetime”*)
-    - Moyenne de température sur la journée (”*temp*”)
-    - Moyenne de température ressentie sur la journée (”*feelslike*”)
-    - Précipitations (”*precip*”) : quantité de liquide tombé / prévu dans la période
-    - Epaisseur de neige au sol (”*snowdepth*”)
-    - Couverture nuageuse (”*cloudcover*”) : entre 0 et 100%
-    - Vitesse du vent (”*windspeed*”) : vitesse moyenne du vent soutenu, mesurée comme la vitesse moyenne du vent survenant au cours de la à deux minutes précédentes
-- **Créateur et éditeur** : Visual Crossing (fournisseur de données météorologiques)
-- **Format :** CSV
-- **Sous-groupes** :
-    - Conditions météorologiques : pluie, neige, vent, etc…
-    - Températures : froid, tempéré, chaud
-    - Saisons : printemps, été, automne, hiver
-    - Jours : semaine ou week-end
-
+-   **Nom du dataset :** weather.csv
+-   **Origine des données** : Ces données proviennent de l’entreprise Visual Crossing qui est un service de météo de Virginia aux Etats Unis.
+-   **Pourquoi ces données ?** Elles permettent d’obtenir la météo de chaque jour afin de pouvoir croiser ces données avec l’utilisation des vélos à Washington
+-   **Nombre d’observations :** 1584, une pour chaque jour entre mai 2020 et août 2024
+-   **Nombre de colonnes :** 32 colonnes dont 7 que nous allons utiliser **:**
+    -   Date (”*datetime”*)
+    -   Moyenne de température sur la journée (”*temp*”)
+    -   Moyenne de température ressentie sur la journée (”*feelslike*”)
+    -   Précipitations (”*precip*”) : quantité de liquide tombé / prévu dans la période
+    -   Epaisseur de neige au sol (”*snowdepth*”)
+    -   Couverture nuageuse (”*cloudcover*”) : entre 0 et 100%
+    -   Vitesse du vent (”*windspeed*”) : vitesse moyenne du vent soutenu, mesurée comme la vitesse moyenne du vent survenant au cours de la à deux minutes précédentes
+-   **Créateur et éditeur** : Visual Crossing (fournisseur de données météorologiques)
+-   **Format :** CSV
+-   **Sous-groupes** :
+    -   Conditions météorologiques : pluie, neige, vent, etc…
+    -   Températures : froid, tempéré, chaud
+    -   Saisons : printemps, été, automne, hiver
+    -   Jours : semaine ou week-end
 
 ### Plan d’analyse
 
 Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on peut catégoriser :
 
-1. Questions exploratoires
-    1. Utilisation générale
-        - Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?\
-        **Graphique :** Lineplot du nombre de trajet en fonction du temps\
-        **Variables :** Nombre de trajets, date
-        - Combien de trajets sont effectués en moyenne par jour/mois ?\
-        **Graphique :** barplot du nombre de trajets par jour de la semaine, par mois de l’année\
-        **Variables :** Nombre de trajets, date d’emprunt
-        - Quelles stations sont les plus utilisées pour les départs/arrivées ?\
-        **Graphique :** Carte avec points de taille différentes pour le nombre de départs/arrivées\
-        **Variables :** Nom des stations, Nombre de départs/arrivées, Coordonnées des stations
-        - Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ?\
-        **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie\
-        **Variables :** Type de vélo, Nombre de trajets par type de vélos
-        - Quel est le comportement moyen selon le type d’utilisateur (occasionnel ou membre) ?\
-        **Graphique :** Radar chart (potentiellement plusieurs)\
-        **Variables :** moyenne de durée de trajet, distance, heure d’emprunt et de dépôt, date (jour de la semaine), type d’abonnement, type de vélo
-        - Quelles sont les durées moyenne des trajets ? Varient-elles selon le jour de la semaine ou la météo ?\
-        **Graphique :** Boxplot ou violin plot\
-        **Variables :** Durée du trajet, type d’utilisateur, date, condition météo
-        - Les vélos électriques sont-ils plus prisés pendant les heures de pointe ?\
-        **Graphique :** Bar plot des différents types de vélo\
-        **Variables :**  Type du vélo, Date
-    2. Spatio-temporel
-        - Quelles stations sont les plus actives à différentes périodes de la journée (matin ou soir) ?\
-        **Graphique :** Heatmap avec X= heure, Y = station et couleur = nombre de trajets\
-        **Variables :** Heure, Nom de la station, Nombre de trajets
-        - Quelles sont les stations les plus utilisées le week-end, en semaine ?\
-        **Graphique :** Stacked barplot\
-        **Variables :** Jour de la semaine, nom station, nombre de trajets
-        - Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?\
-        **Graphique :** Barplot (différence départ, arrivée)\
-        **Variables :** Nom de la station, Nombre de départs/arrivées
-        - Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée) ?\
-        **Graphique :** Barplot (top 10 des paires de stations les plus fréquentées)\
-        **Variables :** Nom de la station de départ, Nom de la station d’arrivée, Nombre de trajets
+1.  Utilisation générale des vélos
 
-2. Questions explicatives
-    1. Lien entre météo et usage
-        - Comment la météo influence-t-elle l’usage des vélos ? (pluie, température, vent, etc…)\
-        **Graphique :** Lineplot ou scatterplot par variable météorologique\
-        **Variables :** Conditions météo, Nombre de trajet par jour
-        - En cas de météo extrême (fortes pluies ou froid extrême), est-ce que le volume de trajets diminue fortement ?\
-        **Graphique :** Boxplot (jours normaux vs météo extrême)\
-        **Variables :** Conditions météo, nombre de trajets
-        - Quel est l’impact de la neige ou du vent ou de la couverture nuageuse sur la durée moyenne des trajets ?\
-        **Graphique :** Lineplot ou scatterplot par variable météorologique\
-        **Variables :** Conditions météo, Durée moyenne des trajets
-    2. Différences selon les utilisateurs
-        - Les membres abonnés utilisent-ils plus les vélos que les usagers occasionnels quand il fait mauvais ?\
-        **Graphique :** Lineplot avec comparaison entre les types d’utilisateur\
-        **Variables :** météo, nombre de trajet, type d’utilisateur
-        - Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?\
-        **Graphique :** Lineplot par type d’utilisateur\
-        **Variables :** nombre de trajets, type d’utilisateurs, mois
-    3. Temporalité
-        - En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?\
-        **Graphique :** Lineplot (heure en abscisse et nombre de trajets en ordonnée)\
-        **Variables :** nombre de trajets, heure
-    4. Évènements
-        - Est ce qu’il est possible de voir une différence d’utilisation des vélos lors de la prise du Capitol le 6 janvier 2021?\
-        **Graphique :** Lineplot (date en abscisse, nombre de trajets en ordonnée, avec mise en évidence du 6 janvier 2021)\
-        **Variables :** Date de début du trajet, Nombre de trajets par jour
+-   Combien de trajets sont effectués en moyenne par jour/mois ? **Graphique :** barplot du nombre de trajets par jour de la semaine, par mois de l’année\
+    **Variables :** Nombre de trajets, date d’emprunt
+-   Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?\
+    **Graphique :** Lineplot du nombre de trajet en fonction du temps\
+    **Variables :** Nombre de trajets, date
+-   Quelles sont les durées moyenne des trajets ? Varient-elles selon le jour de la semaine ou le type d'utilisateur ?\
+    **Graphique :** Boxplot ou violin plot\
+    **Variables :** Durée du trajet, type d’utilisateur, date
+-   Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ? Varie-t-il en fonction du type d'utilisateur ? \
+    **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie\
+    **Variables :** Type de vélo, Nombre de trajets par type de vélos, type d'utilisateur
+-   Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?\
+    **Graphique :** Lineplot par type d’utilisateur\
+    **Variables :** nombre de trajets, type d’utilisateurs, mois
+-   En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?\
+    **Graphique :** Lineplot (heure en abscisse et nombre de trajets en ordonnée)\
+    **Variables :** nombre de trajets, heure
+
+2.  Utilisation des stations
+
+-   Quelles stations sont les plus utilisées pour les départs/arrivées ?\
+    **Graphique :** Carte avec points de taille différentes pour le nombre de départs/arrivées\
+    **Variables :** Nom des stations, Nombre de départs/arrivées, Coordonnées des stations
+-   Quelles stations sont les plus actives à différentes périodes de la journée (matin ou soir) ?\
+    **Graphique :** Heatmap avec X= heure, Y = station et couleur = nombre de trajets\
+    **Variables :** Heure, Nom de la station, Nombre de trajets
+-   Quelles sont les stations les plus utilisées le week-end, en semaine ?\
+    **Graphique :** Stacked barplot\
+    **Variables :** Jour de la semaine, nom station, nombre de trajets
+-   Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?\
+    **Graphique :** Barplot (différence départ, arrivée)\
+    **Variables :** Nom de la station, Nombre de départs/arrivées
+-   Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée) ?\
+    **Graphique :** Barplot (top 10 des paires de stations les plus fréquentées)\
+    **Variables :** Nom de la station de départ, Nom de la station d’arrivée, Nombre de trajets
+
+3.  Lien avec la météo
+
+-   Comment la météo influence-t-elle l’usage des vélos ?
+    (pluie, température, vent, etc…)\
+    **Graphique :** Lineplot ou scatterplot par variable météorologique\
+    **Variables :** Conditions météo, Nombre de trajet par jour
+
+-   Quel est l’impact des conditions météorologiques sur la durée moyenne des trajets ?\
+    **Graphique :** Lineplot ou scatterplot par variable météorologique\
+    **Variables :** Conditions météo, Durée moyenne des trajets
+
+-   En cas de météo extrême (fortes pluies ou froid extrême), est-ce que le volume de trajets diminue fortement ?\
+    **Graphique :** Boxplot (jours normaux vs météo extrême)\
+    **Variables :** Conditions météo, nombre de trajets
+
+-   Les membres abonnés utilisent-ils plus les vélos que les usagers occasionnels quand il fait mauvais ?\
+    **Graphique :** Lineplot avec comparaison entre les types d’utilisateur\
+    **Variables :** météo, nombre de trajet, type d’utilisateur
+
+4.  Question bonus
+
+-   Est ce qu’il est possible de voir une différence d’utilisation des vélos lors de la prise du Capitol le 6 janvier 2021?\
+    **Graphique :** Lineplot (date en abscisse, nombre de trajets en ordonnée, avec mise en évidence du 6 janvier 2021)\
+    **Variables :** Date de début du trajet, Nombre de trajets par jour
 
 ### Contraintes et limites :
-- **Données agrégées** : L'absence d’identifiant unique pour chaque vélo limite les possibilités de reconstitution précise des itinéraires ou des distances parcourues.
-- **Données contextuelles limitées** : Les événements exceptionnels (grèves, manifestations, travaux, etc.) ou les changements d’infrastructure (nouvelles pistes cyclables, réaménagements urbains) ne sont pas pris en compte dans les données disponibles.
-- **Intention de l’usager** : bien qu’il soit riche en information, les jeux de données ne reflète pas nécessairement les raisons des choix des usagers (par ex: s’il n’y a plus de vélos électriques disponibles, l’usager va être contraint de prendre un vélo classique contre son gré)
 
-L’objectif est d’aboutir à une compréhension approfondie de la pratique du cyclisme à Washington à partir de ces jeux de données, en identifiant les tendances d’usage, les comportements des usagers, et les facteurs (comme la météo ou la localisation des stations) influençant l’utilisation du service. Cette analyse vise à fournir des insights pertinents pour les décideurs publics, les urbanistes, les acteurs de la mobilité durable, ainsi que pour les citoyens investis dans l’amélioration des mobilités douces.
+-   **Données agrégées** : L'absence d’identifiant unique pour chaque vélo limite les possibilités de reconstitution précise des itinéraires ou des distances parcourues.
+-   **Données contextuelles limitées** : Les événements exceptionnels (grèves, manifestations, travaux, etc.) ou les changements d’infrastructure (nouvelles pistes cyclables, réaménagements urbains) ne sont pas pris en compte dans les données disponibles.
+-   **Intention de l’usager** : bien qu’il soit riche en information, les jeux de données ne reflète pas nécessairement les raisons des choix des usagers (par ex: s’il n’y a plus de vélos électriques disponibles, l’usager va être contraint de prendre un vélo classique contre son gré)
+
+L’objectif est d’aboutir à une compréhension approfondie de la pratique du cyclisme à Washington à partir de ces jeux de données, en identifiant les tendances d’usage, les comportements des usagers, et les facteurs (comme la météo ou la localisation des stations) influençant l’utilisation du service.
+Cette analyse vise à fournir des insights pertinents pour les décideurs publics, les urbanistes, les acteurs de la mobilité durable, ainsi que pour les citoyens investis dans l’amélioration des mobilités douces.
 
 ## Partie Exploration
 
@@ -198,11 +199,13 @@ require('utils')
 df <- 
 weather <- 
 ```
+
 ## Question 1
 
 **Hypothèse** :
 
-En premier lieu, une observation intéressante à faire est d’observer la tendance générale de l’utilisation des vélos  au cours des années étudiées.  Nous pouvons imaginer une corrélation avec la température pour représenter les saisons, et l’utilisation des vélos. 
+En premier lieu, une observation intéressante à faire est d’observer la tendance générale de l’utilisation des vélos au cours des années étudiées.
+Nous pouvons imaginer une corrélation avec la température pour représenter les saisons, et l’utilisation des vélos.
 
 **Graphique** :
 
@@ -247,12 +250,20 @@ ggplot() +
     axis.title.y.right = element_text(color = "red")
   )
 ```
+
 **Interprétation** :
 
-Nous constatons une augmentation au fil des années de l’utilisation des vélos et surtout une cyclicité. Nous observons une corrélation très forte entre la température et l’utilisation des vélos. Les utilisateurs privilégient l’utilisation des vélos lors de températures chaudes. Ainsi, nous pouvons voir que les utilisations majoritaires se font pendant le printemps, l’été et l’automne. 
+Nous constatons une augmentation au fil des années de l’utilisation des vélos et surtout une cyclicité.
+Nous observons une corrélation très forte entre la température et l’utilisation des vélos.
+Les utilisateurs privilégient l’utilisation des vélos lors de températures chaudes.
+Ainsi, nous pouvons voir que les utilisations majoritaires se font pendant le printemps, l’été et l’automne.
 
-Certaines semaines ne suivent pas le paterne comme la semaine du 3 janvier 2022. Avec une température moyenne de 0°, l’utilisation du vélo est la plus faible du dataset avec 15 083 utilisations. Ceci peut s’expliquer par une chute de neige tombée le 3 janvier où 17,5 cm sont tombés en une journée. 
-On observe des phénomènes similaires lors de la semaine du 19 décembre 2022, en raison de conditions météorologiques défavorables comprenant des grelons, de la neige et de la pluie. Pendant la semaine du 15 janvier 2024, on observe une chute de température importante, passant de 7°C la semaine précédente à -2,5°C. Cette semaine-là, on enregistre également des grelons, de la neige et de la pluie, ce qui contribue à une utilisation réduite des vélos.
+Certaines semaines ne suivent pas le paterne comme la semaine du 3 janvier 2022.
+Avec une température moyenne de 0°, l’utilisation du vélo est la plus faible du dataset avec 15 083 utilisations.
+Ceci peut s’expliquer par une chute de neige tombée le 3 janvier où 17,5 cm sont tombés en une journée.
+On observe des phénomènes similaires lors de la semaine du 19 décembre 2022, en raison de conditions météorologiques défavorables comprenant des grelons, de la neige et de la pluie.
+Pendant la semaine du 15 janvier 2024, on observe une chute de température importante, passant de 7°C la semaine précédente à -2,5°C.
+Cette semaine-là, on enregistre également des grelons, de la neige et de la pluie, ce qui contribue à une utilisation réduite des vélos.
 
 Ces exemples nous amène à nous demander si une corrélation forte peut être associée entre la météo et l’utilisation des vélos.
 
@@ -262,10 +273,11 @@ Ces exemples nous amène à nous demander si une corrélation forte peut être a
 
 **Traitement des données pour les questions 2a et 2b** :
 
-Pour cette analyse, nous avons choisi de ne conserver que la variable started_at, qui indique le moment précis où chaque vélo a été emprunté. À partir de cette information temporelle, nous avons dérivé d’autres variables selon les questions que nous souhaitions étudier :
+Pour cette analyse, nous avons choisi de ne conserver que la variable started_at, qui indique le moment précis où chaque vélo a été emprunté.
+À partir de cette information temporelle, nous avons dérivé d’autres variables selon les questions que nous souhaitions étudier :
 
-* Pour la question 2a, nous avons utilisé la fonction wday() du package lubridate afin d’extraire le jour de la semaine correspondant à chaque date.
-* Pour la question 2b, nous avons extrait le mois grâce à la fonction month().
+-   Pour la question 2a, nous avons utilisé la fonction wday() du package lubridate afin d’extraire le jour de la semaine correspondant à chaque date.
+-   Pour la question 2b, nous avons extrait le mois grâce à la fonction month().
 
 Ces transformations nous ont permis de comprendre l’évolution du nombre d’emprunts selon les moments de la semaine ou de l’année.
 
@@ -274,6 +286,7 @@ Ces transformations nous ont permis de comprendre l’évolution du nombre d’e
 Nous imaginons que les utilisateurs empruntent davantage les vélos en semaine (pour se rendre au travail notamment) que le week-end.
 
 **Graphique** :
+
 ```{r}
 # Préparation des données
 avg_rides_per_day <- df %>%
@@ -313,6 +326,7 @@ Cette observation pourrait être affinée par une analyse horaire (Les pics du m
 Nous supposons que la fréquentation des vélos est plus importante en été, en raison du beau temps, et qu’elle diminue pendant les mois froids et pluvieux.
 
 **Graphique** :
+
 ```{r}
 # Préparation des données
 avg_rides_per_month <- df %>%
@@ -336,18 +350,21 @@ avg_rides_per_month %>%
 
 Le nombre moyen de trajets évolue clairement au rythme des saisons.
 
-L’activité augmente fortement entre avril et septembre, avec un pic en juillet-août où l'on atteint près de 13 000 trajets en moyenne. Cette hausse s’explique sans doute par les vacances estivales et des conditions météorologiques plus favorables.
+L’activité augmente fortement entre avril et septembre, avec un pic en juillet-août où l'on atteint près de 13 000 trajets en moyenne.
+Cette hausse s’explique sans doute par les vacances estivales et des conditions météorologiques plus favorables.
 
-À l'inverse, les trajets diminuent nettement en hiver, notamment entre décembre et février, où le nombre moyen redescend autour de 5 000 trajets en décembre. Cette baisse reflète un usage moindre du vélo durant les mois les plus froids de l'année.
-
+À l'inverse, les trajets diminuent nettement en hiver, notamment entre décembre et février, où le nombre moyen redescend autour de 5 000 trajets en décembre.
+Cette baisse reflète un usage moindre du vélo durant les mois les plus froids de l'année.
 
 ### Question 3 : Quelles stations sont les plus utilisées pour les départs/arrivées ?
 
 **Hypothèse:**
 
-Il serait intéréssant d'étudier quelles sont les stations les plus utilisées pour les départs et les arrivées. On peut supposer que ce sera relativement les mêmes pour les départs et les arrivées, et qu'elles seront à côté de secteurs dynamiques (gares, centre commerciaux, business center...)
+Il serait intéréssant d'étudier quelles sont les stations les plus utilisées pour les départs et les arrivées.
+On peut supposer que ce sera relativement les mêmes pour les départs et les arrivées, et qu'elles seront à côté de secteurs dynamiques (gares, centre commerciaux, business center...)
 
 **Graphique**
+
 ```{r}
 
 top_depart <- df %>%
@@ -385,7 +402,10 @@ ggplot(top_arrivee, aes(x = reorder(end_station_name, n), y = n)) +
 
 **Interprétation**
 
-Premièrement, nous pouvons observer que les stations sont quasiment les mêmes pour les départs et les arrivées. Cela signifie qu'il n'y a pas de déséquilibres au niveau des stations les plus utilisées, il y a de nombreuses personnes qui empruntent des vélos à ces endroits mais il y a beaucoup de vélos qui sont redéposés ici aussi. On peut par contre se poser la question de pourquoi ces stations sont les plus utilisées. Pour répondre à cette question nous allons tracer ces stations sur une carte pour régarder les quartiers/les points d'intêrets près de ces stations.
+Premièrement, nous pouvons observer que les stations sont quasiment les mêmes pour les départs et les arrivées.
+Cela signifie qu'il n'y a pas de déséquilibres au niveau des stations les plus utilisées, il y a de nombreuses personnes qui empruntent des vélos à ces endroits mais il y a beaucoup de vélos qui sont redéposés ici aussi.
+On peut par contre se poser la question de pourquoi ces stations sont les plus utilisées.
+Pour répondre à cette question nous allons tracer ces stations sur une carte pour régarder les quartiers/les points d'intêrets près de ces stations.
 
 **Graphique**
 
@@ -432,7 +452,6 @@ leaflet(top_end_coords) %>%
 
 ```
 
-
 ### Question 4 : Evolution de l'usage des différents types de vélos
 
 **Quelle est l'évolution de l'usage des différents type de vélos ?**
@@ -460,12 +479,17 @@ ggplot(monthly_usage, aes(x = month, y = nb_trajets, color = rideable_type)) +
 
 **Interprétation**
 
-L'évolution mensuelle du nombre d'utilisations par type de vélos permet de montrer plusieurs tendances intéressantes. On peut tout d'abord voir que les vélos « docked » c'est-à-dire les vélos qui se prennent et rendent à des stations ont été les plus populaires avant 2021 mais ont connu une grosse diminution au profit de vélos « classiques ». Ces vélos peuvent être posés et rendus n'importe où et ne nécessitent pas d'être rattachés à une station. Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilisé avant d'être dépassé par les vélos « électriques » qui ont connu une hausse significative à partir de 2023. Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation. Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
+L'évolution mensuelle du nombre d'utilisations par type de vélos permet de montrer plusieurs tendances intéressantes.
+On peut tout d'abord voir que les vélos « docked » c'est-à-dire les vélos qui se prennent et rendent à des stations ont été les plus populaires avant 2021 mais ont connu une grosse diminution au profit de vélos « classiques ».
+Ces vélos peuvent être posés et rendus n'importe où et ne nécessitent pas d'être rattachés à une station.
+Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilisé avant d'être dépassé par les vélos « électriques » qui ont connu une hausse significative à partir de 2023.
+Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation.
+Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
 
 ### Question 5 : Quel est le comportement moyen selon le type d'utilisateur ?
 
-**Hypothèse** 
-On peut se demander ensuite quel est le comportement moyen selon le type d'utilisateur, on peut donc analyser les durées moyennes d'utilisation, le type de vélo, ou les jours d'utilisations des différents types d'utilisateurs. On peut s'attendre à ce que les utilisateurs 'casual' utilisent plus le weekend, plus des vélos électriques et qu'ils aient des moyennes d'utilisations plus longues (balades).
+**Hypothèse** On peut se demander ensuite quel est le comportement moyen selon le type d'utilisateur, on peut donc analyser les durées moyennes d'utilisation, le type de vélo, ou les jours d'utilisations des différents types d'utilisateurs.
+On peut s'attendre à ce que les utilisateurs 'casual' utilisent plus le weekend, plus des vélos électriques et qu'ils aient des moyennes d'utilisations plus longues (balades).
 
 **Graphique**
 
@@ -540,10 +564,15 @@ ggplot(df_prop, aes(x = member_casual, y = proportion, fill = rideable_type)) +
 
 ```
 
-**Interprétation** Nous pouvons valider nos hypothèses sur la durée moyenne et le jour de la semaine. On peut voir que pour la première la moyenne pour les utilisateurs casual est d'environ 30 minutes tandis que pour les members c'est environ 13 min. Pour le jour de la semaine, les utilisateurs casuals font plus de trajets le weekend tandis que les utilisateurs members font plus de trajets la semaine. Ces résultats sont sûrement dûes au fait que les utilisateurs casual utilisent les vélos pour le loisir pour faire des balades le weekend, tandis que les members les utilisent la semaine pour aller travailler, aller à l'école...
-En ce qui concerne le type de vélo utilisés, on peut voir que les membres utilisent les classic et moins les docked comparé aux casuals. Cela peut être dû au fait que les docked existaient avant les classic et ne sont plus très présents, mais qu'en parallèle de ça il y a de plus en plus de trajets de members.
+**Interprétation** Nous pouvons valider nos hypothèses sur la durée moyenne et le jour de la semaine.
+On peut voir que pour la première la moyenne pour les utilisateurs casual est d'environ 30 minutes tandis que pour les members c'est environ 13 min.
+Pour le jour de la semaine, les utilisateurs casuals font plus de trajets le weekend tandis que les utilisateurs members font plus de trajets la semaine.
+Ces résultats sont sûrement dûes au fait que les utilisateurs casual utilisent les vélos pour le loisir pour faire des balades le weekend, tandis que les members les utilisent la semaine pour aller travailler, aller à l'école...
+En ce qui concerne le type de vélo utilisés, on peut voir que les membres utilisent les classic et moins les docked comparé aux casuals.
+Cela peut être dû au fait que les docked existaient avant les classic et ne sont plus très présents, mais qu'en parallèle de ça il y a de plus en plus de trajets de members.
 
 **Graphique**
+
 ```{r}
 
 df_evolution <- df %>%
@@ -565,14 +594,19 @@ ggplot(df_evolution, aes(x = month, y = nb_trajets, color = member_casual)) +
 
 **Interprétation**
 
-On peut voir sur le graphique, qu'il y a de plus en plus de trajets fait par des membres. Il y a donc probablement plus de trajets de membres avec des vélos classiques qu'avec des vélos docked puisqu'il n'y a quasiement plus de vélos docked tandis qu'il y a énormement de vélos classiques en circulation. On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent. Il n'y a pas vraiment de différence d'utilisation. 
-
+On peut voir sur le graphique, qu'il y a de plus en plus de trajets fait par des membres.
+Il y a donc probablement plus de trajets de membres avec des vélos classiques qu'avec des vélos docked puisqu'il n'y a quasiement plus de vélos docked tandis qu'il y a énormement de vélos classiques en circulation.
+On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent.
+Il n'y a pas vraiment de différence d'utilisation.
 
 ### Question 6 : Quelles sont les durées moyennes de trajet ? Quels éléments influent sur cette durée ? (jour de la semaine, météo)
 
 **Hypothèse :**
 
-En étudiant les durées moyennes de trajet, on s'attend à ce que le jour de la semaine, et la météo influent. Nous pensons que les durées des trajets sont plus longues le weekend. La météo serait probablement aussi un facteur. La durée moyenne de trajet devrait être plus courte les jours de mauvais temps.
+En étudiant les durées moyennes de trajet, on s'attend à ce que le jour de la semaine, et la météo influent.
+Nous pensons que les durées des trajets sont plus longues le weekend.
+La météo serait probablement aussi un facteur.
+La durée moyenne de trajet devrait être plus courte les jours de mauvais temps.
 
 ```{r}
 
@@ -667,25 +701,27 @@ merged %>%
 
 **Interprétation** :
 
-On peut voir dans un premier temps, que la moyenne de trajet la semaine est d'environ 17 minutes tandis que celle durant le weekend est nettement plus élevée avec 25 minutes. Cela confirme donc nos attentes. Cela s'explique sûrement par l'utilisation différente des vélos : les gens les utilisent le weekend afin de se promener pour le loisir, tandis que durant la semaine, les utilisateurs s'en servent pour des trajet domicile-travail majoritairement.
+On peut voir dans un premier temps, que la moyenne de trajet la semaine est d'environ 17 minutes tandis que celle durant le weekend est nettement plus élevée avec 25 minutes.
+Cela confirme donc nos attentes.
+Cela s'explique sûrement par l'utilisation différente des vélos : les gens les utilisent le weekend afin de se promener pour le loisir, tandis que durant la semaine, les utilisateurs s'en servent pour des trajet domicile-travail majoritairement.
 
-Ensuite, concernant la météo, on peut voir que les durées moyennes maximum sont atteintes vers 20-25 degrés de température, vers 20km/h de vent et quand il ne pleut pas.Cela signifie que les utilisateurs évitent de faire des grands trajets quand les conditions ne sont pas optimales. 
+Ensuite, concernant la météo, on peut voir que les durées moyennes maximum sont atteintes vers 20-25 degrés de température, vers 20km/h de vent et quand il ne pleut pas.Cela signifie que les utilisateurs évitent de faire des grands trajets quand les conditions ne sont pas optimales.
 
+### Question 8 :
 
+**Quelles stations sont les plus actives à différentes périodes de la journée ?**
 
-### Question 8 : 
+Pour cette analyse, nous avons examiné comment l'activité des stations varie selon les heures de la journée.
+Cette question est essentielle pour comprendre les cycles d'utilisation quotidiens et optimiser la redistribution des vélos aux moments stratégiques.
 
-**Quelles stations sont les plus actives à différentes périodes de la journée ? **
+Notre démarche a consisté à analyser finement la distribution horaire des départs et des arrivées.
+Pour cela, nous avons :
 
-Pour cette analyse, nous avons examiné comment l'activité des stations varie selon les heures de la journée. Cette question est essentielle pour comprendre les cycles d'utilisation quotidiens et optimiser la redistribution des vélos aux moments stratégiques.
-
-Notre démarche a consisté à analyser finement la distribution horaire des départs et des arrivées. Pour cela, nous avons :
-
- - Extrait l'heure de départ et d'arrivée à partir des variables started_at et ended_at
- - Agrégé les données par heure et par station pour quantifier le nombre de trajets
- - Identifié les 20 stations les plus actives pour améliorer la lisibilité
- - Créé des heatmaps visualisant l'intensité d'utilisation selon l'heure
- - Filtré la période nocturne (0h-5h) pour mieux faire ressortir les tendances principales
+-   Extrait l'heure de départ et d'arrivée à partir des variables started_at et ended_at
+-   Agrégé les données par heure et par station pour quantifier le nombre de trajets
+-   Identifié les 20 stations les plus actives pour améliorer la lisibilité
+-   Créé des heatmaps visualisant l'intensité d'utilisation selon l'heure
+-   Filtré la période nocturne (0h-5h) pour mieux faire ressortir les tendances principales
 
 ```{r Q8, echo=FALSE, warning=FALSE}
 
@@ -771,29 +807,35 @@ ggplot(df_heat_top_filtre, aes(x = heure_end, y = reorder(end_station_name, desc
   theme_minimal()
 
 ```
+
 **Interprétation**
 
-L'analyse des heatmaps représentant l'activité des stations de départ et d'arrivée en fonction de l'heure de la journée révèle des modèles d'utilisation intéressants. Les stations les plus actives varient en fonction de l'heure, avec des pics d'activité pendant les heures de pointe (7-9h et 16-18h).
+L'analyse des heatmaps représentant l'activité des stations de départ et d'arrivée en fonction de l'heure de la journée révèle des modèles d'utilisation intéressants.
+Les stations les plus actives varient en fonction de l'heure, avec des pics d'activité pendant les heures de pointe (7-9h et 16-18h).
 
-L'analyse des stations révèle deux profils d'utilisation distincts. "New Hampshire Ave & T St NW", entourée de logements sans parking, présente un pic d'activité le matin pour les départs et le soir pour les arrivées, caractéristique d'un flux pendulaire marqué. "Columbus Circle/Union Station", connectée aux transports en commun, montre une utilisation dominante aux heures de pointe, liée aux horaires de travail.
+L'analyse des stations révèle deux profils d'utilisation distincts.
+"New Hampshire Ave & T St NW", entourée de logements sans parking, présente un pic d'activité le matin pour les départs et le soir pour les arrivées, caractéristique d'un flux pendulaire marqué.
+"Columbus Circle/Union Station", connectée aux transports en commun, montre une utilisation dominante aux heures de pointe, liée aux horaires de travail.
 
-À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, connaissent une activité plus étalée sur la journée, avec un pic en milieu de journée. Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
+À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, connaissent une activité plus étalée sur la journée, avec un pic en milieu de journée.
+Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
 
 Les autres stations, comme "5th & K St NW", suivent également un schéma professionnel avec une activité concentrée autour des heures de pointe, reflétant une utilisation principalement liée aux déplacements domicile-travail.
 
+### Question 9 :
 
-### Question 9 : 
+**Quelles sont les stations les plus utilisées le week-end, en semaine ?**
 
-**Quelles sont les stations les plus utilisées le week-end, en semaine ? **
+Pour cette analyse, nous avons voulu examiner comment l'utilisation des stations varie entre la semaine et le week-end.
+Cette question est pertinente car elle permet de distinguer les stations principalement utilisées pour les trajets domicile-travail (en semaine) de celles fréquentées pour des activités de loisirs (week-end).
 
-Pour cette analyse, nous avons voulu examiner comment l'utilisation des stations varie entre la semaine et le week-end. Cette question est pertinente car elle permet de distinguer les stations principalement utilisées pour les trajets domicile-travail (en semaine) de celles fréquentées pour des activités de loisirs (week-end).
+Notre démarche a consisté à transformer les données temporelles pour catégoriser chaque trajet selon qu'il a lieu en semaine ou le week-end.
+Pour cela, nous avons :
 
-Notre démarche a consisté à transformer les données temporelles pour catégoriser chaque trajet selon qu'il a lieu en semaine ou le week-end. Pour cela, nous avons :
-
- - Extrait le jour de la semaine à partir de la variable started_at
- - Créé une variable binaire "type_jour" (Semaine/Week-end)
- - Agrégé les données par station et par type de jour
- - Filtré les 10 stations les plus actives pour améliorer la lisibilité
+-   Extrait le jour de la semaine à partir de la variable started_at
+-   Créé une variable binaire "type_jour" (Semaine/Week-end)
+-   Agrégé les données par station et par type de jour
+-   Filtré les 10 stations les plus actives pour améliorer la lisibilité
 
 ```{r Q9, echo=FALSE, warning=FALSE}
 
@@ -842,13 +884,16 @@ ggplot(df_bar_top, aes(x = reorder(start_station_name, nb_trajets), y = nb_traje
 
 **Interprétation**
 
-L'analyse des stations révèle deux profils d'utilisation distincts. "New Hampshire Ave & T St NW", entourée de logements sans parking, génère le plus grand volume total avec des flux pendulaires marqués. "Columbus Circle/Union Station", connectée aux transports, montre une utilisation dominante en semaine (75%) liée aux horaires de travail.
+L'analyse des stations révèle deux profils d'utilisation distincts.
+"New Hampshire Ave & T St NW", entourée de logements sans parking, génère le plus grand volume total avec des flux pendulaires marqués.
+"Columbus Circle/Union Station", connectée aux transports, montre une utilisation dominante en semaine (75%) liée aux horaires de travail.
 
-À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, présentent une forte proportion d'utilisation le week-end (40-45%). Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
+À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, présentent une forte proportion d'utilisation le week-end (40-45%).
+Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
 
 Les autres stations comme "5th & K St NW" suivent également un schéma professionnel avec une faible utilisation le week-end.
 
-### Question 10 : 
+### Question 10 :
 
 **Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?**
 
@@ -977,13 +1022,18 @@ print(main_plot)
 
 L'analyse des déséquilibres départs/arrivées révèle une géographie fonctionnelle marquée du système Capital Bikeshare, illustrant parfaitement les flux de mobilité directionnels qui caractérisent la structure urbaine de Washington DC. Cette cartographie des asymétries dévoile deux types de stations aux rôles bien distincts : les stations "sources" génératrices de trajets et les stations "puits" d'attraction.
 
-Les stations à surplus de départs dessinent clairement la carte des quartiers résidentiels et périphériques de la capitale. 11th & Kenyon St NW domine largement avec un excédent de 21 867 départs, suivie de près par Park Rd & Holmead Pl NW (+21 573), toutes deux situées dans les zones résidentielles du Nord-Ouest. Ces stations fonctionnent comme des "gares de départ" matinales où les résidents entament leurs trajets vers le centre-ville, créant un flux sortant massif qui nécessite un réapprovisionnement constant en vélos. L'amplitude de ces déséquilibres, dépassant les 20 000 trajets, témoigne de l'intensité des mouvements pendulaires quotidiens et de l'appropriation du vélo-partage comme solution de premier/dernier kilomètre.
+Les stations à surplus de départs dessinent clairement la carte des quartiers résidentiels et périphériques de la capitale.
+11th & Kenyon St NW domine largement avec un excédent de 21 867 départs, suivie de près par Park Rd & Holmead Pl NW (+21 573), toutes deux situées dans les zones résidentielles du Nord-Ouest.
+Ces stations fonctionnent comme des "gares de départ" matinales où les résidents entament leurs trajets vers le centre-ville, créant un flux sortant massif qui nécessite un réapprovisionnement constant en vélos.
+L'amplitude de ces déséquilibres, dépassant les 20 000 trajets, témoigne de l'intensité des mouvements pendulaires quotidiens et de l'appropriation du vélo-partage comme solution de premier/dernier kilomètre.
 
-À l'inverse, les stations déficitaires en départs se concentrent dans les zones d'attraction touristique et commerciale, révélant leur statut de destinations privilégiées. Georgetown Harbor / 30th St NW (-16 061) et C & O Canal & Wisconsin Ave NW (-13 901) capturent massivement les arrivées sans générer proportionnellement de départs, confirmant leur rôle de terminus pour les visiteurs découvrant le front de mer historique de Georgetown. Ces stations "puits" accumulent les vélos en fin de parcours touristique, créant un défi logistique 
+À l'inverse, les stations déficitaires en départs se concentrent dans les zones d'attraction touristique et commerciale, révélant leur statut de destinations privilégiées.
+Georgetown Harbor / 30th St NW (-16 061) et C & O Canal & Wisconsin Ave NW (-13 901) capturent massivement les arrivées sans générer proportionnellement de départs, confirmant leur rôle de terminus pour les visiteurs découvrant le front de mer historique de Georgetown.
+Ces stations "puits" accumulent les vélos en fin de parcours touristique, créant un défi logistique
 
-### Question 11 : 
+### Question 11 :
 
-**Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée) **
+**Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée)**
 
 ```{r Q11_1 ,warning=FALSE}
 # 1. Calculer les trajets les plus fréquents
@@ -1055,15 +1105,22 @@ plot_top_routes <- ggplot(top_routes, aes(x = reorder(trajet_court, nombre_traje
 print(plot_top_routes)
 
 ```
+
 **Interprétation**
 
-Le classement des trajets les plus fréquents révèle un phénomène remarquable : les 10 trajets les plus populaires sont tous des trajets en boucle (même station de départ et d'arrivée), confirmant l'importance de l'usage récréatif et touristique du système Capital Bikeshare. Cette prédominance s'explique par la concentration de ces stations autour des sites emblématiques de Washington D.C., où les utilisateurs privilégient l'exploration locale plutôt que les déplacements utilitaires.
+Le classement des trajets les plus fréquents révèle un phénomène remarquable : les 10 trajets les plus populaires sont tous des trajets en boucle (même station de départ et d'arrivée), confirmant l'importance de l'usage récréatif et touristique du système Capital Bikeshare.
+Cette prédominance s'explique par la concentration de ces stations autour des sites emblématiques de Washington D.C., où les utilisateurs privilégient l'exploration locale plutôt que les déplacements utilitaires.
 
-Jefferson Dr & 14th St SW domine largement avec 19 785 trajets, représentant 0,12% du trafic total, suivi de très près par Smithsonian-National Mall avec 18 657 trajets. Ces deux destinations phares du National Mall captent à elles seules près de 38 500 trajets en boucle, démontrant leur statut exceptionnel dans l'écosystème touristique de la capitale. Le groupe suivant se structure autour de trois destinations majeures (4th St & Madison Dr NW, Gravelly Point, Lincoln Memorial) oscillant entre 12 725 et 14 807 trajets, révélant une hiérarchie claire dans l'attractivité des sites patrimoniaux et récréatifs.
+Jefferson Dr & 14th St SW domine largement avec 19 785 trajets, représentant 0,12% du trafic total, suivi de très près par Smithsonian-National Mall avec 18 657 trajets.
+Ces deux destinations phares du National Mall captent à elles seules près de 38 500 trajets en boucle, démontrant leur statut exceptionnel dans l'écosystème touristique de la capitale.
+Le groupe suivant se structure autour de trois destinations majeures (4th St & Madison Dr NW, Gravelly Point, Lincoln Memorial) oscillant entre 12 725 et 14 807 trajets, révélant une hiérarchie claire dans l'attractivité des sites patrimoniaux et récréatifs.
 
-Le bas du classement (stations 6 à 10) maintient des volumes substantiels entre 9 785 et 11 777 trajets, confirmant que même les destinations "moins populaires" du top 10 génèrent un trafic récréatif considérable. Cette répartition démontre que Capital Bikeshare a réussi à créer un réseau de loisirs urbains performant, où chaque station fonctionne comme un hub autonome d'exploration locale. La structure tarifaire favorisant les trajets de moins de 45 minutes encourage ces usages en boucle, transformant le système en une véritable plateforme de découverte touristique tout en maintenant un modèle économique viable.
+Le bas du classement (stations 6 à 10) maintient des volumes substantiels entre 9 785 et 11 777 trajets, confirmant que même les destinations "moins populaires" du top 10 génèrent un trafic récréatif considérable.
+Cette répartition démontre que Capital Bikeshare a réussi à créer un réseau de loisirs urbains performant, où chaque station fonctionne comme un hub autonome d'exploration locale.
+La structure tarifaire favorisant les trajets de moins de 45 minutes encourage ces usages en boucle, transformant le système en une véritable plateforme de découverte touristique tout en maintenant un modèle économique viable.
 
-Cette prédominance des trajets en boucle masque cependant une réalité importante des déplacements effectifs. Si nous excluons ces trajets circulaires pour nous concentrer uniquement sur les véritables déplacements d'un point A vers un point B, un paysage très différent émerge
+Cette prédominance des trajets en boucle masque cependant une réalité importante des déplacements effectifs.
+Si nous excluons ces trajets circulaires pour nous concentrer uniquement sur les véritables déplacements d'un point A vers un point B, un paysage très différent émerge
 
 **Top 10 des trajets point-à-point (trajets différents)**
 
@@ -1138,17 +1195,20 @@ print(plot_top_routes)
 
 **Interprétation**
 
-Le classement des trajets point-à-point révèle un paysage beaucoup plus diversifié que les trajets en boucle, mettant en évidence deux logiques d'usage distinctes : les déplacements utilitaires urbains et les circuits touristiques inter-monuments. Cette analyse dévoile les véritables flux de mobilité du système Capital Bikeshare lorsque les utilisateurs se déplacent effectivement d'un point A vers un point B.
+Le classement des trajets point-à-point révèle un paysage beaucoup plus diversifié que les trajets en boucle, mettant en évidence deux logiques d'usage distinctes : les déplacements utilitaires urbains et les circuits touristiques inter-monuments.
+Cette analyse dévoile les véritables flux de mobilité du système Capital Bikeshare lorsque les utilisateurs se déplacent effectivement d'un point A vers un point B.
 
-Columbus Circle / Union Station emerge comme un hub de transit majeur, dominant 4 des 10 trajets les plus fréquents avec des connexions bidirectionnelles vers 8th & F St NE (9 603 et 8 206 trajets) et 6th & H St NE (8 697 et 6 578 trajets). Cette prédominance s'explique par le statut de Union Station comme principale gare ferroviaire de Washington, créant un effet d'attraction naturel pour les correspondances multimodales vers les quartiers résidentiels et professionnels du nord-est. Les volumes légèrement asymétriques entre les sens aller-retour suggèrent des patterns de mobilité pendulaire avec des pointes directionnelles selon les heures.
+Columbus Circle / Union Station emerge comme un hub de transit majeur, dominant 4 des 10 trajets les plus fréquents avec des connexions bidirectionnelles vers 8th & F St NE (9 603 et 8 206 trajets) et 6th & H St NE (8 697 et 6 578 trajets).
+Cette prédominance s'explique par le statut de Union Station comme principale gare ferroviaire de Washington, créant un effet d'attraction naturel pour les correspondances multimodales vers les quartiers résidentiels et professionnels du nord-est.
+Les volumes légèrement asymétriques entre les sens aller-retour suggèrent des patterns de mobilité pendulaire avec des pointes directionnelles selon les heures.
 
-Le triangle touristique Lincoln Memorial - Jefferson Memorial - Jefferson Dr & 14th St SW constitue le second cluster dominant avec 6 trajets représentant plus de 38 000 déplacements cumulés. Le trajet Lincoln Memorial → Jefferson Memorial (8 941 trajets) domine cette catégorie, révélant un circuit patrimonial privilégié par les visiteurs souhaitant relier les deux mémoriaux iconiques en 15-20 minutes de vélo. La réciprocité quasi-parfaite des flux (8 196 et 8 177 trajets entre Lincoln Memorial et Jefferson Dr & 14th St SW) confirme l'existence de parcours touristiques structurés où le vélo devient l'outil optimal pour découvrir l'ensemble monumental de la capitale américaine.
+Le triangle touristique Lincoln Memorial - Jefferson Memorial - Jefferson Dr & 14th St SW constitue le second cluster dominant avec 6 trajets représentant plus de 38 000 déplacements cumulés.
+Le trajet Lincoln Memorial → Jefferson Memorial (8 941 trajets) domine cette catégorie, révélant un circuit patrimonial privilégié par les visiteurs souhaitant relier les deux mémoriaux iconiques en 15-20 minutes de vélo.
+La réciprocité quasi-parfaite des flux (8 196 et 8 177 trajets entre Lincoln Memorial et Jefferson Dr & 14th St SW) confirme l'existence de parcours touristiques structurés où le vélo devient l'outil optimal pour découvrir l'ensemble monumental de la capitale américaine.
 
 Maintenant que nous avons identifié la nature particulière des trajets en boucle, analysons plus précisément leurs caractéristiques temporelles pour comprendre les comportements d'usage qui les motivent
 
-**Distribution des temps de trajet" (en pourcentages)** \n
-Distribution du temps de trajet pour les trajets ayant le meme point de depart et d'arriver
-https://capitalbikeshare.com/pricing
+**Distribution des temps de trajet" (en pourcentages)** \n Distribution du temps de trajet pour les trajets ayant le meme point de depart et d'arriver <https://capitalbikeshare.com/pricing>
 
 ```{r Q11_3,warning=FALSE}
 
@@ -1248,13 +1308,17 @@ cat("Trajets ≤ 75min:", round(seuil_75$total, 1), "%\n")
 
 **Interprétation**
 
-La distribution des temps de trajet pour les trajets en boucle (même station de départ et d'arrivée) révèle des comportements d'usage particuliers fortement influencés par la structure tarifaire de Capital Bikeshare. On observe une concentration majeure des trajets dans la zone verte (≤45 minutes), correspondant à la période gratuite pour les abonnés journaliers et annuels, ce qui suggère que de nombreux utilisateurs planifient délibérément leurs sorties récréatives, sportives ou touristiques pour rester dans cette fenêtre sans frais supplémentaires.
+La distribution des temps de trajet pour les trajets en boucle (même station de départ et d'arrivée) révèle des comportements d'usage particuliers fortement influencés par la structure tarifaire de Capital Bikeshare.
+On observe une concentration majeure des trajets dans la zone verte (≤45 minutes), correspondant à la période gratuite pour les abonnés journaliers et annuels, ce qui suggère que de nombreux utilisateurs planifient délibérément leurs sorties récréatives, sportives ou touristiques pour rester dans cette fenêtre sans frais supplémentaires.
 
-La diminution progressive dans la zone orange (45-75 minutes) s'explique par l'introduction des frais de 0,05$/minute pour les vélos classiques, incitant les utilisateurs à raccourcir leurs balades ou à accepter un coût modéré pour des activités de loisir plus longues. Cette baisse devient encore plus marquée dans la zone rouge (>75 minutes), où les coûts cumulés deviennent dissuasifs pour la plupart des utilisateurs occasionnels.
+La diminution progressive dans la zone orange (45-75 minutes) s'explique par l'introduction des frais de 0,05\$/minute pour les vélos classiques, incitant les utilisateurs à raccourcir leurs balades ou à accepter un coût modéré pour des activités de loisir plus longues.
+Cette baisse devient encore plus marquée dans la zone rouge (\>75 minutes), où les coûts cumulés deviennent dissuasifs pour la plupart des utilisateurs occasionnels.
 
-Ces trajets en boucle reflètent principalement des usages de loisir, d'exercice physique ou de découverte touristique plutôt que des déplacements utilitaires. L'émergence des vélos électriques depuis 2023, malgré leur coût supérieur (0,10-0,15$/minute), peut expliquer une partie des trajets plus longs car ils permettent d'explorer des distances plus importantes avec moins d'effort, rendant les balades étendues plus accessibles à un public plus large, y compris aux utilisateurs moins sportifs.
+Ces trajets en boucle reflètent principalement des usages de loisir, d'exercice physique ou de découverte touristique plutôt que des déplacements utilitaires.
+L'émergence des vélos électriques depuis 2023, malgré leur coût supérieur (0,10-0,15\$/minute), peut expliquer une partie des trajets plus longs car ils permettent d'explorer des distances plus importantes avec moins d'effort, rendant les balades étendues plus accessibles à un public plus large, y compris aux utilisateurs moins sportifs.
 
-Cette distribution globale des temps cache des variations importantes selon les stations. En détaillant la répartition des durées pour chaque station pratiquant des trajets en boucle, nous pouvons identifier des profils d'usage spécifiques
+Cette distribution globale des temps cache des variations importantes selon les stations.
+En détaillant la répartition des durées pour chaque station pratiquant des trajets en boucle, nous pouvons identifier des profils d'usage spécifiques
 
 **Répartition détaillée des durées par station**
 
@@ -1401,18 +1465,21 @@ cat(">75min:", global_stats$total_75min_plus, "(", global_stats$prop_75min_plus,
 
 **Interprétation**
 
-La répartition des durées de trajets en boucle par station révèle des profils d'usage distincts liés à la vocation géographique et touristique de chaque localisation. Les stations les plus populaires pour les trajets circulaires se concentrent autour de sites emblématiques de Washington D.C., avec Jefferson Dr & 14th St SW et Smithsonian-National Mall en tête, confirmant l'usage majoritairement récréatif et touristique de ce type de trajet.
+La répartition des durées de trajets en boucle par station révèle des profils d'usage distincts liés à la vocation géographique et touristique de chaque localisation.
+Les stations les plus populaires pour les trajets circulaires se concentrent autour de sites emblématiques de Washington D.C., avec Jefferson Dr & 14th St SW et Smithsonian-National Mall en tête, confirmant l'usage majoritairement récréatif et touristique de ce type de trajet.
 
-On observe une prédominance systématique des trajets courts (≤45 minutes, zone verte) dans toutes les stations, reflétant l'influence de la structure tarifaire gratuite pour les abonnés dans cette tranche. Cependant, certaines stations comme Jefferson Dr & 14th St SW, Smithsonian-National Mall, et Gravelly Point présentent des proportions plus importantes de trajets moyens et longs (zones orange et rouge), suggérant que ces emplacements favorisent des activités de loisir plus étendues malgré les coûts supplémentaires.
+On observe une prédominance systématique des trajets courts (≤45 minutes, zone verte) dans toutes les stations, reflétant l'influence de la structure tarifaire gratuite pour les abonnés dans cette tranche.
+Cependant, certaines stations comme Jefferson Dr & 14th St SW, Smithsonian-National Mall, et Gravelly Point présentent des proportions plus importantes de trajets moyens et longs (zones orange et rouge), suggérant que ces emplacements favorisent des activités de loisir plus étendues malgré les coûts supplémentaires.
 
-Les stations situées près de sites naturels ou panoramiques (Gravelly Point, Roosevelt Island, National Harbor Carousel) montrent des durées plus variées, indiquant que les utilisateurs sont disposés à payer des frais additionnels pour profiter pleinement de ses environnements particuliers. À l'inverse, les stations plus urbaines et centrales (15th St & Pennsylvania Ave NW, Jefferson Memorial) présentent une concentration plus marquée dans la zone gratuite, suggérant un usage plus utilitaire ou des contraintes budgétaires plus strictes pour ces localisations.
-
+Les stations situées près de sites naturels ou panoramiques (Gravelly Point, Roosevelt Island, National Harbor Carousel) montrent des durées plus variées, indiquant que les utilisateurs sont disposés à payer des frais additionnels pour profiter pleinement de ses environnements particuliers.
+À l'inverse, les stations plus urbaines et centrales (15th St & Pennsylvania Ave NW, Jefferson Memorial) présentent une concentration plus marquée dans la zone gratuite, suggérant un usage plus utilitaire ou des contraintes budgétaires plus strictes pour ces localisations.
 
 ### Question 15 : Les utilisateurs membres utilisent-ils plus les vélos par mauvais temps ?
 
 **Hypothèse**
 
-On se demande si les utilisateurs membres utilisent plus les vélos par mauvais temps. Nous aurions tendance à dire que oui, que les utilisateurs casual les utilisent pendant des périodes de beau temps pour faire des balades tandis que les utilisateurs membre les utilisent pour se déplacer quotidiennement, ce qui peut inclure davantage de trajets sous le mauvais temps.
+On se demande si les utilisateurs membres utilisent plus les vélos par mauvais temps.
+Nous aurions tendance à dire que oui, que les utilisateurs casual les utilisent pendant des périodes de beau temps pour faire des balades tandis que les utilisateurs membre les utilisent pour se déplacer quotidiennement, ce qui peut inclure davantage de trajets sous le mauvais temps.
 
 ```{r}
 
@@ -1469,6 +1536,6 @@ merged %>%
 
 **Interprétation**
 
-Sur ce graphique, nous avons représenté les jours de mauvais temps par les jours où il y a soit plus de 1mm de précipitation soit plus de 25km/h de vent. \
-On peut voir que contrairement à nos hypothèses que le mauvais temps affecte quasiement autant les utilisateurs réguliers que les utilisateurs occasionnels. On peut voir également que finalement, les utilisateurs en règle générale ne sont pas très affectés par la météo, environ 45% des trajets sont réalisés sous mauvais temps.
-
+Sur ce graphique, nous avons représenté les jours de mauvais temps par les jours où il y a soit plus de 1mm de précipitation soit plus de 25km/h de vent.\
+On peut voir que contrairement à nos hypothèses que le mauvais temps affecte quasiement autant les utilisateurs réguliers que les utilisateurs occasionnels.
+On peut voir également que finalement, les utilisateurs en règle générale ne sont pas très affectés par la météo, environ 45% des trajets sont réalisés sous mauvais temps.
