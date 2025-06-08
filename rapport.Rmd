@@ -196,7 +196,7 @@ require('utils')
 ```{r}
 #importation du jeu de données
 df <- 
-weather <-
+weather <- 
 ```
 ## Question 1
 
@@ -341,6 +341,98 @@ L’activité augmente fortement entre avril et septembre, avec un pic en juille
 À l'inverse, les trajets diminuent nettement en hiver, notamment entre décembre et février, où le nombre moyen redescend autour de 5 000 trajets en décembre. Cette baisse reflète un usage moindre du vélo durant les mois les plus froids de l'année.
 
 
+### Question 3 : Quelles stations sont les plus utilisées pour les départs/arrivées ?
+
+**Hypothèse:**
+
+Il serait intéréssant d'étudier quelles sont les stations les plus utilisées pour les départs et les arrivées. On peut supposer que ce sera relativement les mêmes pour les départs et les arrivées, et qu'elles seront à côté de secteurs dynamiques (gares, centre commerciaux, business center...)
+
+**Graphique**
+```{r}
+
+top_depart <- df %>%
+  dplyr::filter(!is.na(start_station_name)& start_station_name != "") %>%
+  count(start_station_name, sort = TRUE) %>%
+  slice_head(n = 10)
+
+ggplot(top_depart, aes(x = reorder(start_station_name, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 10 des stations de départ",
+    x = "Station de départ",
+    y = "Nombre de trajets"
+  ) +
+  theme_minimal()
+
+top_arrivee <- df %>%
+  filter(!is.na(end_station_name)& end_station_name != "") %>%
+  count(end_station_name, sort = TRUE) %>%
+  slice_head(n = 10)
+
+ggplot(top_arrivee, aes(x = reorder(end_station_name, n), y = n)) +
+  geom_bar(stat = "identity", fill = "darkgreen") +
+  coord_flip() +
+  labs(
+    title = "Top 10 des stations d'arrivée",
+    x = "Station d'arrivée",
+    y = "Nombre de trajets"
+  ) +
+  theme_minimal()
+
+
+```
+
+**Interprétation**
+
+Premièrement, nous pouvons observer que les stations sont quasiment les mêmes pour les départs et les arrivées. Cela signifie qu'il n'y a pas de déséquilibres au niveau des stations les plus utilisées, il y a de nombreuses personnes qui empruntent des vélos à ces endroits mais il y a beaucoup de vélos qui sont redéposés ici aussi. On peut par contre se poser la question de pourquoi ces stations sont les plus utilisées. Pour répondre à cette question nous allons tracer ces stations sur une carte pour régarder les quartiers/les points d'intêrets près de ces stations.
+
+**Graphique**
+
+```{r}
+
+top_depart_coords <- df %>%
+  filter(!is.na(start_station_name), start_station_name != "") %>%
+  count(start_station_name, start_lat, start_lng, sort = TRUE) %>%
+  slice_head(n = 10)
+
+leaflet(top_depart_coords) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~start_lng,
+    lat = ~start_lat,
+    label = ~paste0(start_station_name, ": ", n, " trajets"),
+    radius = 6,
+    fillColor = "blue",
+    color = "black",
+    fillOpacity = 0.7,
+    stroke = TRUE
+  ) %>%
+  addLegend("bottomright", colors = "blue", labels = "Stations de départ", title = "Top 10")
+
+
+top_end_coords <- df %>%
+  filter(!is.na(start_station_name), end_station_name != "") %>%
+  count(end_station_name, end_lat, end_lng, sort = TRUE) %>%
+  slice_head(n = 10)
+
+leaflet(top_end_coords) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~end_lng,
+    lat = ~end_lat,
+    label = ~paste0(end_station_name, ": ", n, " trajets"),
+    radius = 6,
+    fillColor = "red",
+    color = "black",
+    fillOpacity = 0.7,
+    stroke = TRUE
+  ) %>%
+  addLegend("bottomright", colors = "red", labels = "Stations d'arrivées", title = "Top 10")
+
+```
+
+
 ### Question 4 : Evolution de l'usage des différents types de vélos
 
 **Quelle est l'évolution de l'usage des différents type de vélos ?**
@@ -369,6 +461,112 @@ ggplot(monthly_usage, aes(x = month, y = nb_trajets, color = rideable_type)) +
 **Interprétation**
 
 L'évolution mensuelle du nombre d'utilisations par type de vélos permet de montrer plusieurs tendances intéressantes. On peut tout d'abord voir que les vélos « docked » c'est-à-dire les vélos qui se prennent et rendent à des stations ont été les plus populaires avant 2021 mais ont connu une grosse diminution au profit de vélos « classiques ». Ces vélos peuvent être posés et rendus n'importe où et ne nécessitent pas d'être rattachés à une station. Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilisé avant d'être dépassé par les vélos « électriques » qui ont connu une hausse significative à partir de 2023. Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation. Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
+
+### Question 5 : Quel est le comportement moyen selon le type d'utilisateur ?
+
+**Hypothèse** 
+On peut se demander ensuite quel est le comportement moyen selon le type d'utilisateur, on peut donc analyser les durées moyennes d'utilisation, le type de vélo, ou les jours d'utilisations des différents types d'utilisateurs. On peut s'attendre à ce que les utilisateurs 'casual' utilisent plus le weekend, plus des vélos électriques et qu'ils aient des moyennes d'utilisations plus longues (balades).
+
+**Graphique**
+
+```{r}
+
+
+df_moy_ride <- df %>%
+  mutate(
+    started_at = ymd_hms(started_at),
+    ended_at = ymd_hms(ended_at),
+    ride_duration = as.numeric(difftime(ended_at, started_at, units = "mins"))
+  ) %>%
+  filter(ride_duration > 0 & ride_duration < 1440) 
+
+df_moy_ride %>%
+  group_by(member_casual) %>%
+  summarise(avg_duration = mean(ride_duration)) %>%
+  ggplot(aes(x = member_casual, y = avg_duration, fill = member_casual)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Durée moyenne des trajets selon le type d'utilisateur",
+    x = "Type d'utilisateur",
+    y = "Durée moyenne (min)"
+  ) +
+  theme_minimal()
+
+
+
+df_moy_ride %>%
+  mutate(day_of_week = wday(started_at, label = TRUE)) %>%
+  count(member_casual, day_of_week) %>%
+  ggplot(aes(x = day_of_week, y = n, fill = member_casual)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Utilisation selon le jour de la semaine",
+    x = "Jour",
+    y = "Nombre de trajets",
+    fill = "Utilisateur"
+  ) +
+  theme_minimal()
+
+df_prop <- df %>%
+  group_by(member_casual, rideable_type) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(member_casual) %>%
+  mutate(proportion = n / sum(n) * 100)
+
+
+ggplot(df_prop, aes(x = member_casual, y = proportion, fill = rideable_type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "Répartition des types de vélos par type d'utilisateur",
+    x = "Type d'utilisateur", y = "Proportion (%)", fill = "Type de vélo"
+  ) +
+  theme_minimal()
+
+df_prop <- df %>%
+  group_by(member_casual, rideable_type) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(member_casual) %>%
+  mutate(proportion = n / sum(n) * 100)
+
+ggplot(df_prop, aes(x = member_casual, y = proportion, fill = rideable_type)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Répartition des types de vélos par utilisateur",
+    x = "Type d'utilisateur",
+    y = "Proportion (%)",
+    fill = "Type de vélo"
+  ) +
+  theme_minimal()
+
+```
+
+**Interprétation** Nous pouvons valider nos hypothèses sur la durée moyenne et le jour de la semaine. On peut voir que pour la première la moyenne pour les utilisateurs casual est d'environ 30 minutes tandis que pour les members c'est environ 13 min. Pour le jour de la semaine, les utilisateurs casuals font plus de trajets le weekend tandis que les utilisateurs members font plus de trajets la semaine. Ces résultats sont sûrement dûes au fait que les utilisateurs casual utilisent les vélos pour le loisir pour faire des balades le weekend, tandis que les members les utilisent la semaine pour aller travailler, aller à l'école...
+En ce qui concerne le type de vélo utilisés, on peut voir que les membres utilisent les classic et moins les docked comparé aux casuals. Cela peut être dû au fait que les docked existaient avant les classic et ne sont plus très présents, mais qu'en parallèle de ça il y a de plus en plus de trajets de members.
+
+**Graphique**
+```{r}
+
+df_evolution <- df %>%
+  mutate(month = floor_date(date, "month")) %>%  # ou "week" / "day"
+  group_by(month, member_casual) %>%
+  summarise(nb_trajets = n(), .groups = "drop")
+
+ggplot(df_evolution, aes(x = month, y = nb_trajets, color = member_casual)) +
+  geom_line(size = 1.2) +
+  geom_point() +
+  labs(
+    title = "Évolution du nombre de trajets par type d'utilisateur",
+    x = "Date",
+    y = "Nombre de trajets",
+    color = "Type d'utilisateur"
+  ) +
+  theme_minimal()
+```
+
+**Interprétation**
+
+On peut voir sur le graphique, qu'il y a de plus en plus de trajets fait par des membres. Il y a donc probablement plus de trajets de membres avec des vélos classiques qu'avec des vélos docked puisqu'il n'y a quasiement plus de vélos docked tandis qu'il y a énormement de vélos classiques en circulation. On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent. Il n'y a pas vraiment de différence d'utilisation. 
+
 
 ### Question 8 : 
 
