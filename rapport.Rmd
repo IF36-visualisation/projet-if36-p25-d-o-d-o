@@ -553,9 +553,130 @@ Il y a donc probablement plus de trajets de membres avec des vélos classiques q
 On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent.
 Il n'y a pas vraiment de différence d'utilisation.
 
-### Question 16
+### Question 16 : Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?
 
-### Question 17 
+**Hypothèse** :
+On peut supposer que les cyclistes occasionnels sont plus sensibles aux conditions météorologiques et aux périodes touristiques. Ainsi, leur fréquence d’utilisation augmenterait significativement pendant les saisons plus favorables comme le printemps et surtout l’été, où le climat est agréable et les activités extérieures sont privilégiées.
+
+À l’inverse, les membres abonnés continueraient à utiliser le service de manière plus stable tout au long de l’année, y compris en automne et en hiver, notamment pour des trajets domicile-travail.
+
+On s’attend donc à observer une variation saisonnière marquée chez les usagers occasionnels, contrairement aux membres réguliers.
+
+**Graphique** :
+```{r}
+# Fonction de transformation mois -> saison
+get_season <- function(month) {
+  case_when(
+    month %in% c(12, 1, 2)  ~ "Hiver",
+    month %in% c(3, 4, 5)   ~ "Printemps",
+    month %in% c(6, 7, 8)   ~ "Été",
+    month %in% c(9, 10, 11) ~ "Automne"
+  )
+}
+
+# Préparation des données avec regroupement par saison
+seasonal_rides <- data %>%
+  transmute(
+    user_type = recode(member_casual,
+                       "casual" = "Occasionnel",
+                       "member" = "Abonné"),
+    month = month(started_at),
+    season = get_season(month)
+  ) %>%
+  count(user_type, season) %>%
+  mutate(season = factor(season, levels = c("Printemps", "Été", "Automne", "Hiver")))
+
+# Visualisation
+ggplot(seasonal_rides, aes(x = season, y = n, group = user_type, color = user_type)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Évolution saisonnière du nombre de trajets selon le type d'utilisateur",
+    x = "Saison",
+    y = "Nombre de trajets",
+    color = "Type d'utilisateur"
+  ) +
+  theme_minimal()
+```
+**Interprétation** :
+Ce graphique représente l’évolution saisonnière du nombre de trajets effectués par les abonnés et les usagers occasionnels.
+
+Similarité dans les tendances :
+On remarque que les deux types d’utilisateurs suivent une évolution très similaire au fil des saisons :
+
+* Un pic d’utilisation en été, suivi du printemps,
+* Une baisse à l’automne,
+* Et un minimum en hiver.
+
+Cela suggère que les comportements saisonniers (influencés par la météo, les vacances, etc.) touchent de manière comparable abonnés et occasionnels.
+
+Différence de volume :
+En revanche, le nombre de trajets est systématiquement plus élevé chez les abonnés, quelle que soit la saison :
+
+* En été, ils réalisent environ 3,37 millions de trajets contre 2,5 millions pour les occasionnels.
+* En hiver, bien que l’usage chute pour les deux groupes, les abonnés restent nettement plus actifs (1,5 million vs 0,65 million).
+
+Cela indique qu’il existe une base d’usagers réguliers bien plus importante, qui continue d’utiliser le service toute l’année, même en conditions moins favorables.
+
+### Question 17 : En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?
+
+**Hypothèse** :
+Les utilisateurs abonnés adoptent très probablement des comportements liés à leur routine quotidienne (trajets domicile-travail par exemple). Ils seraient donc plus susceptibles d’utiliser les vélos pendant les heures de pointe, notamment en début de matinée (trajet vers le travail) et en fin de journée (retour).
+
+À l’inverse, les utilisateurs occasionnels ont une utilisation plus flexible et dispersée dans la journée, et leur recours aux vélos ne devrait pas particulièrement se concentrer sur les heures de pointe.
+
+On s’attend donc à observer des pics d’utilisation pendant les heures de pointe uniquement chez les abonnés, tandis que les utilisateurs occasionnels auront une répartition horaire plus homogène au cours de la journée.
+
+**Graphique** :
+```{r}
+# Étape 1 : extraire l'heure et le type d'utilisateur
+rides_user_hours <- data %>%
+  transmute(
+    user_type = member_casual,            # Type d'utilisateur (membre ou occasionnel)
+    hour = hour(started_at)               # Heure de départ
+  ) %>%
+  count(user_type, hour) %>%              # Nombre de trajets par heure et par type
+  group_by(user_type) %>%
+  mutate(prop = n / sum(n)) %>%           # Proportions pour comparer les profils
+  ungroup()
+
+# Visualisation membres
+rides_user_hours %>%
+  filter(user_type == "member") %>%
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col(fill = "steelblue") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Répartition horaire des trajets — Utilisateurs abonnés",
+    x = "Heure de départ",
+    y = "Proportion des trajets"
+  ) +
+  theme_minimal()
+
+# Visualisation occasionnels
+rides_user_hours %>%
+  filter(user_type == "casual") %>%
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col(fill = "darkorange") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Répartition horaire des trajets — Utilisateurs occasionnels",
+    x = "Heure de départ",
+    y = "Proportion des trajets"
+  ) +
+  theme_minimal()
+```
+
+**Interprétation** :
+Le graphique montre la répartition horaire des trajets effectués selon le type d’utilisateur (abonné ou occasionnel), en pourcentage du total des trajets de chaque groupe.
+
+On constate que :
+
+Les abonnés présentent des pics très marqués à 8 h (7,1% des trajets) et 17–18 h (10% et 8,9%), ce qui correspond clairement aux heures de pointe traditionnelles. On note aussi une activité significative dès 6 h du matin (2%), ce qui renforce l’idée d’un usage dans le cadre de déplacements domicile-travail.
+
+À l’inverse, les occasionnels ont une distribution plus lissée dans la journée, avec une montée progressive de l'activité à partir de 7 h, avec un pic à 17 h (autour de 9.5%) et un déclin en soirée. Il n’y a pas de véritables heures de pointe, ce qui traduit un usage plus souple et orienté loisir.
+
+Ces résultats confirment que les abonnés sont des usagers réguliers qui utilisent le service dans un cadre professionnel. En revanche, les cyclistes occasionnels exploitent davantage le service en dehors des pics, ce qui reflète une utilisation non contrainte par des horaires fixes.
 
 # Utilisation des stations 
 
