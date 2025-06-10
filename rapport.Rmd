@@ -20,6 +20,8 @@ Julien Schieler, Icham Lecorvaisier, Mathis Reslinger, Lila Mortier
 
 ## Introduction
 
+Ce rapport présente une analyse approfondie de l'utilisation des vélos libre-service à Washington, en exploitant quatre jeux de données pour identifier les tendances d'usage, les comportements des usagers et les facteurs influençant l'utilisation du service, afin de fournir des insights pertinents pour les décideurs publics et les acteurs de la mobilité durable.
+
 ### Données
 
 Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre-service à Washington :
@@ -1513,11 +1515,141 @@ On peut voir que les durées moyennes maximum sont atteintes vers 20-25 degrés 
 
 ### Question 12 
 
-### Question 13 
+### Question 13
 
-### Question 15 
+**En cas de température extrême, est-ce que le volume de trajets diminue fortement ?**
+
+**Hypothèse** :
+
+On cherche maintenant à s'intéresser à des cas extrêmes de température pour essayer d'observer un potentiel changement dû à ceci. Ainsi, nous avons cherché 4 évènements inclus dans les dates de nos données où les températures ont été particulièrement basses et hautes pendant une longue durée.
+
+En premier temps nous verrons l'impact de 2 évènements à température froide extrême, et ensuite 2 évènements à température chaude extrême.
+
+Pour les évènements froid, nous en avons choisi un en février 2021, et l'autre en décembre 2022:
+En février 2021, Dû à un anticyclone arctique qui a soudainement déplacé de l’air glacial vers le sud. Une vague de froid a débuté au Canada et s'est propagé rapidement sur le territoire américain, affectant particulièrement le Texas, un État généralement habitué à des températures plus chaudes.
+Cependant nous avons aussi pu observer une durée de 6 jours à Washington DC où les températures étaient nettement plus basse que les journées précédentes.
+Source : https://journals.ametsoc.org/view/journals/bams/103/12/BAMS-D-21-0266.1.xml
+
+En décembre 2022, autour de Noël, un vent froid a balayé la région Washington DC  entraînant des températures extrêmes en dessous de 0 en raison de fréquentes rafales de vent à environ 48km/h.
+Source : https://www.weather.gov/mrx/December_2022_Record_Cold
+
+Comme on l'a observé dans la question précédente, la température a un effet sur l'utilisation des usagers, ainsi nous pensons que l'utilisation sera réduites lors de ces pics froid et chaud.
+
+**Graphiques** :
+```{r Q13 froid, echo=FALSE}
+filtrer_dates <- function(dates) {
+  df_meteo %>%
+    filter(date %in% ymd(dates))
+}
+
+period_tempextreme_froid_dec22 <- c("2022-12-25", "2022-12-24", "2022-12-23")
+period_tempextreme_froid_fev21 <- c("2021-01-29", "2021-01-30", "2021-01-31", "2021-02-01", "2021-02-02", "2021-02-03")
+
+period4semaines_tempextreme_froid_fev21 <- format(seq(min(ymd(period_tempextreme_froid_fev21)) - days(14), 
+                                               max(ymd(period_tempextreme_froid_fev21)) + days(14), 
+                                               by = "day"), "%Y-%m-%d")
+period4semaines_tempextreme_froid_dec22 <- format(seq(min(ymd(period_tempextreme_froid_dec22)) - days(14), 
+                                               max(ymd(period_tempextreme_froid_dec22)) + days(14), 
+                                               by = "day"), "%Y-%m-%d")
 
 
+df_tempextreme_froid_dec22 <- filtrer_dates(period4semaines_tempextreme_froid_dec22)
+df_tempextreme_froid_fev21 <- filtrer_dates(period4semaines_tempextreme_froid_fev21)
+
+
+#Visualisation 1 temp extreme froide
+plotQ13_froid1 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajets)) +
+  geom_col(aes(fill = ifelse(date %in% period_tempextreme_froid_dec22, "Période froide", "Période normale"))) +
+  geom_smooth(data = df_tempextreme_froid_dec22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
+  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en décembre 2022",
+    x = "Date", y = "Nombre de trajets par jour") +
+  scale_fill_manual(values = c("Période froide" = "blue", "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  theme_minimal()
+
+#Visualisation 2 temp extreme froide
+plotQ13_froid2 <- ggplot(df_tempextreme_froid_fev21, aes(x = date, y = nb_trajets)) +
+  geom_col(aes(fill = ifelse(date %in% period_tempextreme_froid_fev21, "Période froide", "Période normale"))) +
+  geom_smooth(data = df_tempextreme_froid_fev21, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
+  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en février 2021",
+    x = "Date", y = "Nombre de trajets par jour") +
+  scale_fill_manual(values = c("Période froide" = "blue", "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  theme_minimal()
+
+plotQ13_froid1
+plotQ13_froid2
+
+```
+**Interprétation**
+La première visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en décembre 2022. Grâce à un barplot, on peut observer le nombre de trajet cumulé chaque jour ainsi que sa courbe de régression en rouge. La période de l'évènement est mis en valeur en colorant en bleu les barres la concernant. On voit une grosse chute d'utilisation par 4 si l'on compare avec les jours précédent. Cependant on remarque aussi que les jours juste avant et après l 'évènement suivent la même tendance. Ceci peut s'expliquer parce que les températures du 22 décembre (veille de l'évènement choisi) a déja atteint ...°C, une différence de ... °C avec le jour d'après.
+
+La seconde visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en février 2021. On peut voir que les deux premiers jours n'ont pas tellement d'impact sur l'utilisation des vélos, mais à partir du 3ème. On voit une réelle chute pendant 3 jours, qui ensuite remonte le dernier jour.
+
+**Hypothèse**
+
+Nous cherchons maintenant à voir l'impact que ces températures extrêmes chaudes auraient pu avoir sur l'utilisation des vélos.
+
+En second temps nous verrons l'impact de 2 évènements à température chaudes extrêmes.
+
+Pour les évènements chaud, nous en avons choisi un en mai 2022, et l'autre en juillet 2024:
+En mai 2022, Washington D.C. a connu une vague de chaleur marquante, enregistrant des températures exceptionnellement élevées pour cette période de l'année. Selon les prévisions de la National Weather Service, les températures ont commencé à grimper rapidement, atteignant des niveaux rarement observés si tôt dans la saison.
+Source :https://www.washingtonpost.com/weather/2022/05/19/dc-may-heat-wave-record/
+
+En juillet 2024, Washington D.C. a subi une vague de chaleur particulièrement intense qui a marqué l'un des mois de juillet les plus chauds jamais enregistrés.Lors de cette vague de chaleur, la température a atteint 39 °C le 15 juillet, établissant un nouveau record pour cette date.
+Source : https://www.washingtonpost.com/weather/2024/07/16/dc-heat-100-record-high-temperatures/
+
+On peut supposer que le même effet de baisse d'utilisation des vélos aura lieu durant les pics de chaleur.
+
+**Graphiques**
+
+```{r Q13 chaud, echo=FALSE}
+filtrer_dates <- function(dates) {
+  df_meteo %>%
+    filter(date %in% ymd(dates))
+}
+period_tempextreme_chaud_may22 <- c("2022-05-20", "2022-05-21", "2022-05-22")
+period_tempextreme_chaud_july24 <- c("2024-07-14", "2024-07-15", "2024-07-16", "2024-07-17", "2024-07-18")
+
+period4semaines_tempextreme_chaud_may22 <- format(seq(min(ymd(period_tempextreme_chaud_may22)) - days(14), 
+                                               max(ymd(period_tempextreme_chaud_may22)) + days(14), 
+                                               by = "day"), "%Y-%m-%d")
+period4semaines_tempextreme_chaud_july24 <- format(seq(min(ymd(period_tempextreme_chaud_july24)) - days(14), 
+                                               max(ymd(period_tempextreme_chaud_july24)) + days(14), 
+                                               by = "day"), "%Y-%m-%d")
+df_tempextreme_chaud_may22 <- filtrer_dates(period4semaines_tempextreme_chaud_may22)
+df_tempextreme_chaud_july24 <- filtrer_dates(period4semaines_tempextreme_chaud_july24)
+
+#Visualisation 3 temp extreme chaude may22
+plotQ13_chaud1 <- ggplot(df_tempextreme_chaud_may22, aes(x = date, y = nb_trajets)) +
+  geom_col(aes(fill = ifelse(date %in% period_tempextreme_chaud_may22, "Période chaude", "Période normale"))) +
+  geom_smooth(data = df_tempextreme_chaud_may22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
+  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes chaudes en mai 2022",
+    x = "Date", y = "Nombre de trajets par jour") +
+  scale_fill_manual(values = c("Période chaude" = "blue", "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  theme_minimal()
+
+
+#Visualisation 4 temp extreme chaude july24
+plotQ13_chaud2 <- ggplot(df_tempextreme_chaud_july24, aes(x = date, y = nb_trajets)) +
+  geom_col(aes(fill = ifelse(date %in% period_tempextreme_chaud_july24, "Période chaude", "Période normale"))) +
+  geom_smooth(data = df_tempextreme_chaud_july24, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
+  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes chaudes en juillet 2024",
+    x = "Date", y = "Nombre de trajets par jour") +
+  scale_fill_manual(values = c("Période chaude" = "blue", "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  theme_minimal()
+
+
+plotQ13_chaud1
+plotQ13_chaud2
+```
+**Interprétation**
+
+La première visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en mai 2022. Grâce à un barplot, on peut observer le nombre de trajet cumulé chaque jour ainsi que sa courbe de régression en rouge. La période de l'évènement est mis en valeur en colorant en bleu les barres la concernant. A l'inverse des périodes froides, on voit une réaction totalement inverse. Les utilisateurs ne diminuent pas du tout et reste les mêmes, malgré des chaleurs avoisinant les ...°C.
+
+La seconde visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en juillet 2024. 
 
 ### Question 15 : Les utilisateurs membres utilisent-ils plus les vélos par mauvais temps ?
 
@@ -1586,4 +1718,163 @@ On peut voir que contrairement à nos hypothèses que le mauvais temps affecte q
 On peut voir également que finalement, les utilisateurs en règle générale ne sont pas très affectés par la météo, environ 45% des trajets sont réalisés sous mauvais temps.
 
 
-### Question 18 
+### Question 18 : 
+
+**Hypothèse**
+
+Dans la matinée du mercredi 6 janvier, les manifestants encerclent le Washington Monument et se rassemblent pour assister à des discours prononcés par Rudy Giuliani, conseiller de Trump, et par Trump lui-même. Il a réitéré des allégations infondées de fraude électorale et a exhorté ses partisans à marcher vers le Capitole, déclarant : "battons-nous comme des diables". En réponse, des milliers de manifestants ont convergé vers le Capitole (13h10), franchissant les barrières de sécurité et pénétrant dans le bâtiment (14h). Les forces de l'ordre, en sous-effectif, ont été rapidement débordées et le capitole a été mis en confinement. A 14h48, le maire de Washington déclare un couvre-feu dans toute la ville. Ainsi on essaye alors de savoir s'il est possible de voir une différence d'utilisation des vélos lors de la prise du Capitole.
+On peut imaginer qu'à partir de l'information du couvre feu, les gens partirent rapidement de leur travail pour rentrer.
+
+Source : 
+https://fr.euronews.com/2022/01/06/l-assaut-du-capitole-retour-sur-le-deroule-de-cette-journee-noire-pour-la-democratie-ameri
+https://edition.cnn.com/2022/07/10/politics/jan-6-us-capitol-riot-timeline
+https://edition.cnn.com/interactive/2021/01/politics/us-capitol-siege/
+
+**Graphique 1**
+On souhaite d'abord voir sur l'ensemble de la journée s'il y a eu plus d'utilisation que les jours précédents et suivants le 6 janvier
+```{r Q18, echo=FALSE}
+filtrer_dates <- function(dates) {
+  df_meteo %>%
+    filter(date %in% ymd(dates))
+}
+
+date_prise_capitole <- "2021-01-06"
+
+period4semaines_prise_capitole <- format(seq(min(ymd(date_prise_capitole)) - days(14), 
+                                               max(ymd(date_prise_capitole)) + days(14), 
+                                               by = "day"), "%Y-%m-%d")
+
+df_prise_capitole <- filtrer_dates(period4semaines_prise_capitole)
+
+#Visualisation 1 temp extreme froide
+ggplot(df_prise_capitole, aes(x = date, y = nb_trajets)) +
+  geom_col(aes(fill = ifelse(date %in% date_prise_capitole, "Prise Capitole", "Période normale"))) +
+  geom_smooth(data = df_prise_capitole, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
+  labs(title = "Observation des nombres de trajets par jour lors de la prise du Capitole",
+    x = "Date", y = "Nombre de trajets par jour") +
+  scale_fill_manual(values = c("Prise Capitole" = "blue", "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  theme_minimal()
+
+
+
+
+```
+**Interprétation**
+La visualisation est faite sur 14 jours précédant et 14 jours suivant le 6 janvier. Grâce à un barplot, on peut observer le nombre de trajet cumulé chaque jour ainsi que sa courbe de régression en rouge. 
+On observe aucun changement apparent dans l'utilisation quotidienne des vélos le 6 janvier. 
+
+
+**Hypothèse**
+Cependant on peut supposer que l'assaut du Capitole a entraîné une augmentation de l'utilisation des vélos autour du Capitole et du parc The Ellipse, où Donald Trump a prononcé son discours. (lieu du speech de Donald Trump). On peut donc s'intéresser à l'activité par station pour repérer des hausses à partir de ce moment là.
+On qualifie les augmentations par une fréquentation supérieure à la normale.
+
+On commence la visualisation à partir du moment où les manifestants partent du Washington Monument et marchent sur la Pennsylvania Avenue (13h10) jusqu'à rejoindre le Capitole. Les premières intrusions dans le bâtiment ont lieu vers 14h. Un couvre feu est annoncé à 14h48 et mis en place à 18h, fin de la visualisation. 
+
+**Graphique 2**
+```{r Q18 bis, echo=FALSE}
+# Dates à comparer
+date_capitole <- "2021-01-06"   
+date_reference <- "2021-01-13"  
+
+# Fonction simplifiée pour extraire les données essentielles
+analyser_journee <- function(date) {
+  df %>%
+    filter(as.Date(started_at) == as.Date(date)) %>%
+    mutate(heure_minute = hour(started_at) + minute(started_at)/60) %>%
+    filter(!is.na(start_lat), !is.na(start_lng), !is.na(start_station_name),
+           heure_minute >= 13.2, heure_minute < 18) %>%  # Période critique uniquement
+    group_by(start_station_name) %>%
+    summarise(
+      trajets = n(),
+      start_lat = median(start_lat),
+      start_lng = median(start_lng),
+      .groups = "drop"
+    )
+}
+
+# Analyser les deux journées
+capitole <- analyser_journee(date_capitole)
+reference <- analyser_journee(date_reference)
+
+# Comparaison directe - EXCLURE L'ACTIVITÉ RÉDUITE
+comparaison <- capitole %>%
+  inner_join(reference, by = "start_station_name", suffix = c("_cap", "_ref")) %>%
+  mutate(
+    diff_relative = (trajets_cap - trajets_ref) / pmax(trajets_ref, 1) * 100,
+    # Créer la variable scaled pour l'échelle continue
+    diff_relative_scaled = pmax(diff_relative, 0),  # Minimum à 0 pour l'échelle
+    anomalie = case_when(
+      diff_relative >= 50 ~ "Anomalie forte",
+      diff_relative >= 25 ~ "Anomalie modérée", 
+      TRUE ~ "Normal"
+    )
+  ) %>%
+  filter(trajets_cap >= 3 | trajets_ref >= 3,    # Seuil minimal
+         diff_relative > -25) %>%                  # EXCLURE activité réduite
+  arrange(desc(diff_relative))
+
+# Palette couleurs continue - Échelle de bleus
+palette_continue <- colorNumeric(
+  palette = c("#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"),
+  domain = c(0, max(comparaison$diff_relative_scaled, na.rm = TRUE))
+)
+
+# Carte
+map_comparison <- leaflet(comparaison) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  
+  # Capitole
+  addMarkers(lng = -77.0090, lat = 38.8899, popup = "Capitole des États-Unis") %>%
+  addMarkers(lng = -77.035507, lat = 38.894207, popup = "The Ellipse (parc)") %>%
+  
+  # Stations avec échelle continue
+  addCircleMarkers(
+    lng = ~start_lng_cap, lat = ~start_lat_cap,
+    color = ~palette_continue(diff_relative_scaled),        # Utiliser palette_continue
+    fillColor = ~palette_continue(diff_relative_scaled),    # Utiliser palette_continue
+    radius = ~pmax(4, abs(diff_relative)/15 + 3),
+    fillOpacity = 0.8,
+    stroke = TRUE,
+    weight = 1,
+    popup = ~paste0(
+      "<b>", start_station_name, "</b><br/>",
+      "6 jan: ", trajets_cap, " trajets<br/>",
+      "13 jan: ", trajets_ref, " trajets<br/>",
+      "Différence: ", round(diff_relative, 1), "%<br/>",
+      "Statut: ", anomalie
+    )
+  ) %>%
+  
+  # Légende avec échelle continue
+  addLegend(
+    position = "bottomright",
+    pal = palette_continue,                    # Utiliser palette_continue
+    values = ~diff_relative_scaled,            # Utiliser diff_relative_scaled
+    title = "Augmentation (%)",
+    labFormat = labelFormat(suffix = "%")
+  ) %>%
+  
+  # Titre
+  addControl(
+    html = "<h3>6 janvier vs 13 janvier 2021<br/>Période 14h48-18h<br/><small>Échelle continue de bleus</small></h3>",
+    position = "topleft"
+  )
+
+
+# Afficher la carte
+map_comparison
+```
+
+**Interprétation**
+Cette visualisation interactive montre uniquement les augmentations d’utilisation des stations de vélos en libre-service à Washington, DC, entre deux mercredis consécutifs : le 6 janvier 2021 (jour de l’assaut du Capitole) et le 13 janvier 2021, durant la même tranche horaire critique : 13h10 à 18h. 
+
+Seules les stations ayant enregistré une activité significative (au moins 3 trajets sur l’une ou l’autre des journées) sont prises en compte. Les stations ayant connu une forte baisse sont exclues pour se concentrer sur les hausses anormales.
+Pour chaque station, la variation de trafic est calculée en pourcentage par rapport au volume référent du 13 janvier.
+Échelle continue de bleus : plus l'augmentation du trafic est forte, plus la couleur de la station est foncée, et plus le cercle est large.
+Un clic sur un cercle affiche les trajets enregistrés pour chacun des deux jours, le pourcentage de variation, et le statut d’anomalie.
+Les emplacements du Capitole et du Washington Monument sont signalés pour repérer les zones d’intérêts principales.
+
+On peut observer que les stations au nord de la Pennsylvania Avenue (avenue utilisée par les manifestants) ont des utilisations qui ont augmentées comparé à la normale. Les 3 stations avec les plus grosses augmentations autour de l'avenue sont "17th & G St NW", "10th & G St NW", et "4th & D St NW / Judiciary Square".
+En voyant la visualisation on remarque qu'il existe des augmentations inhabituelles autour de l'avenue potentiellement lié à la manifestation mais cependant il est difficile d'établir un lien direct.
+
