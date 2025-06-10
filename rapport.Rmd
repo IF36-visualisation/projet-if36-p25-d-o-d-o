@@ -575,7 +575,7 @@ get_season <- function(month) {
 }
 
 # Préparation des données avec regroupement par saison
-seasonal_rides <- data %>%
+seasonal_rides <- df %>%
   transmute(
     user_type = recode(member_casual,
                        "casual" = "Occasionnel",
@@ -629,8 +629,8 @@ On s’attend donc à observer des pics d’utilisation pendant les heures de po
 
 **Graphique** :
 ```{r}
-# Étape 1 : extraire l'heure et le type d'utilisateur
-rides_user_hours <- data %>%
+# Extraction de l'heure et du type d'utilisateur
+rides_user_hours <- df %>%
   transmute(
     user_type = member_casual,            # Type d'utilisateur (membre ou occasionnel)
     hour = hour(started_at)               # Heure de départ
@@ -1536,9 +1536,6 @@ cat("Total trajets aller-retour:", global_stats$total_trajets, "\n")
 cat("≤45min:", global_stats$total_45min_moins, "(", global_stats$prop_45min_moins, "%)\n")
 cat("45-75min:", global_stats$total_45min_75min, "(", global_stats$prop_45min_75min, "%)\n") 
 cat(">75min:", global_stats$total_75min_plus, "(", global_stats$prop_75min_plus, "%)\n")
-
-
-
 ```
 
 **Interprétation**
@@ -1631,10 +1628,106 @@ merged %>%
 
 On peut voir que les durées moyennes maximum sont atteintes vers 20-25 degrés de température, vers 20km/h de vent et quand il ne pleut pas. Cela signifie que les utilisateurs évitent de faire des grands trajets quand les conditions ne sont pas optimales.
 
-
 ### Question 14 
 
+**Hypothèse**
+
+On s'intéresse maitenant à d'autres facteurs météorologiques comme le vent, les nuages et la neige sur les durées moyennes des trajets afin de voir si un temps mauvais défavorise l'utilisation du vélo avec les utilisateurs. On remarque qu'il y a 8617 observations où les durées sont négatives car les vélos ont été arrêtés avant d'être pris donc on les enlève de notre visualisation pour ne pas fausser nos calculs de durées de trajets.
+
+**Graphique**
+```{r Q14, echo=FALSE}
+# Calcul de la durée moyenne des trajets par jour
+df_duree <- df %>%
+  group_by(date) %>%
+  filter(ended_at >= started_at) %>%
+  summarise(
+    duree_moyenne_minute = mean(difftime(ended_at, started_at, units = "mins"), na.rm = TRUE),
+    duree_moyenne_hours = mean(difftime(ended_at, started_at, units = "hours"), na.rm = TRUE),
+    .groups = "drop")%>%
+  #supprimer n outlier en plus de 6h de location qui fausse l'échelle
+  filter(duree_moyenne_hours < 6)
+
+# Jointure avec les données météo
+df_meteo_duree <- inner_join(df_duree, weather, by = c("date" = "datetime"))
+
+df_meteo_duree$duree_moyenne_minute <- as.numeric(df_meteo_duree$duree_moyenne_minute)
+df_meteo_duree$duree_moyenne_hours <- as.numeric(df_meteo_duree$duree_moyenne_hours)
+
+
+# Graphique : Vent et durée moyenne des trajets
+ggplot(df_meteo_duree, aes(x = windspeed, y = duree_moyenne_minute)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue") +
+  labs(title = "Vent et durée moyenne des trajets",
+       x = "Vitesse du vent (km/h)", y = "Durée moyenne des trajets") +
+  theme_minimal()
+
+# Graphique : Couverture nuageuse et durée moyenne des trajets
+ggplot(df_meteo_duree, aes(x = cloudcover, y = duree_moyenne_minute)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue") +
+  labs(title = "Couverture nuageuse et durée moyenne des trajets",
+       x = "Couverture nuageuse (%)", y = "Durée moyenne des trajets") +
+  theme_minimal()
+
+# Graphique : Neige et durée moyenne des trajets
+ggplot(df_meteo_duree, aes(x = snow, y = duree_moyenne_minute)) +
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE, aes(color = "Tendance"), span = 1, color = "blue") +
+  labs(title = "Neige et durée moyenne des trajets",
+       x = "Neige", y = "Durée moyenne des trajets (minutes)") +
+  theme_minimal()
+```
+
+**Interprétation**
+La première visualisation met en relation la vitesse du vent et la durée moyenne des trajets afin d'observer si le vent a un impact sur l'utilisation des vélos des usagers. On observe que la majorité des trajets ont une durée moyenne comprise entre 0 et 60 minutes, quelle que soit la vitesse du vent. Il y a également quelques points extrêmes (outliers) où la durée des trajets est très longue, mais ces cas restent rares. Entre 0 et 20km/h on observe une légère augmentation de l'utilisation sûrement dûe au fait qu'il soit rare que le vent soit en dessous de 20 km/h. Après 20km/h on voit une très légère baisse qui décroit encore plus vers 35 km/h montrant que la durée d'utilisation des vélos est plus faibles. On peut donc dire que les utilisateurs ont tendnace à faire des trajets plus courts lorsque le vent est fort.
+
+La deuxième visualisation met en relation la couverture nuageuse et la durée moyenne des trajets afin d'observer si les nuages ont un impact sur l'utilisation des vélos des usagers. Encore une fois la très grande majorité des points se situe sous les 60 minutes de durée moyenne, quel que soit le pourcentage de couverture nuageuse. La courbe de tendance bleue indique une légère hausse de la durée moyenne des trajets jusqu’à environ 25–30 % de couverture nuageuse, puis une faible diminution à mesure que la couverture nuageuse augmente. Aucun effet marqué ou extrême n’est observé concernant la couverture nuageuse : la dispersion des points reste assez constante sur toute la plage des valeurs. Quelques valeurs extrêmes (outliers) existent aussi pour des durées de trajet très longues, mais elles restent minoritaires.
+
+La troisième visualisation met en relation la neige et la durée moyenne des trajets afin d'observer si la neige a un impact sur l'utilisation des vélos des usagers. La grande majorité des observations se trouvent à 0 de neige, où la durée moyenne des trajets est très variable, avec plusieurs points extrêmes où la durée dépasse 100 minutes. Ceci peut s'expliquer parce que il y a pas beaucoup de moments où il y a de la neuge, ainsi la plupart de smesures ont été faites lorsque neige est à 0.
+En présence de neige : Dès qu'il y a présence de neige (valeurs supérieures à 0), le nombre d'observations diminue fortement et la durée moyenne des trajets semble globalement plus faible ou relativement stable, entre 20 et 40 minutes pour la plupart des points.
+
 ### Question 12 
+
+**Hypothèse** :
+Comme on l'a vu précédemment en question 1, les vélos sont moins utilisés en hiver, sûrement parce qu'il fait plus froid. On souhaite maintenant voir de manière plus précise la relation entre la météo (température, pluie) sur l'influence de l'usage des vélos partagés. Ces 2 visulisations permettront d'avoir une perspective approfondie des manières dont les conditons météorologiques impactent l'utilisation.
+
+**Graphique** :
+
+```{r Q12, echo=FALSE}
+# Extraction des variables de date et heure
+df$date <- as.Date(df$started_at)
+
+# Agrégation des données quotidiennes
+df_quotidien <- df %>%
+  group_by(date) %>%
+  summarise(nb_trajets = n(), .groups = "drop")
+
+# Jointure avec les données météo (supposons que 'meteo' est un dataframe contenant les données météo)
+df_meteo <- inner_join(df_quotidien, weather, by = c("date" = "datetime"))
+
+# Visualisation 1 : Température maximale et nombre de trajets par jour
+ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Relation entre le nombre de trajets par jour et la température maximale",
+       x = "Température maximale (°C)", y = "Nombre de trajets par jour") +
+  theme_minimal()
+
+# Visualisation 2 : Précipitations et nombre de trajets par jour
+ggplot(df_meteo, aes(x = precipcover, y = nb_trajets)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Relation entre le nombre de trajets par jour et les précipitations",
+       x = "Précipitations (mm)", y = "Nombre de trajets par jour") +
+  theme_minimal()
+
+```
+
+**Interprétation** :
+La première visualisation est un nuage de point représentant le nombre de trajets par jour en fonction de la température maximale (en degré celsius) enregistrée dans la journée. La droite de régression en rouge permet d'illustrer la tendance générale. On observe une nette corrélation positive entre l'utilisation des vélos et la température. Cela signifie que lorsque la température augmente, l'utilisation des vélos augmente. Cependant, les points restent assez dispersés montrant que d'autres facteurs influencent sûrement également l'utilisation des vélos partagés.
+
+La deuxième visualisation est elle aussi un nuage de points représentant le nombre de trajets par jour en fonction de la précipitation (en mm). On a aussi ajouté une courbe de régression en bleu montrant la tendance générale. A la différence de la première visualisation, la corrélation entre l'utilisation des vélos et les précipitations est négative. Le résultat est plutôt cohérent, personne n'aime faire du vélo sous la pluie. Comme pour la première visualisation, les points sont dispersés autour de la droite de régression montrant potentiellement l'importance d'autre facteur dans l'utilisation des vélos.
 
 ### Question 13
 
