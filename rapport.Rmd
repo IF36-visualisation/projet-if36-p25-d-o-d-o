@@ -191,6 +191,8 @@ library(ggplot2);
 library(dplyr); 
 library(lubridate);
 require('utils')
+options(ggplot2.discrete.fill = RColorBrewer::brewer.pal(4, "Set2"))
+options(ggplot2.continous.fill = RColorBrewer::brewer.pal(4, "PuBu"))
 
 ```
 
