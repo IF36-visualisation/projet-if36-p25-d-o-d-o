@@ -202,11 +202,11 @@ weather <-
 
 # Utilisation générale des vélos 
 
-### Question 2
+### Question 1
 
-#### Question 2a : Y a-t-il une variation du nombre de trajets selon les jours de la semaine ?
+#### Question 1a : Y a-t-il une variation du nombre de trajets selon les jours de la semaine ?
 
-**Traitement des données pour les questions 2a et 2b** :
+**Traitement des données pour les questions 1a et 1b** :
 
 Pour cette analyse, nous avons choisi de ne conserver que la variable started_at, qui indique le moment précis où chaque vélo a été emprunté.
 À partir de cette information temporelle, nous avons dérivé d’autres variables selon les questions que nous souhaitions étudier :
@@ -286,7 +286,7 @@ On peut voir sur le graphique que les utilisateurs casuals font plus de trajets 
 Ces résultats sont sûrement dûs au fait que les utilisateurs casual utilisent les vélos pour le loisir pour faire des balades le weekend, tandis que les members les utilisent la semaine pour aller travailler, aller à l'école...
 Cela confirme donc nos hypothèses initiales
 
-#### Question 2b : Y a-t-il une variation du nombre de trajets selon les mois de l’année ?
+#### Question 1b : Y a-t-il une variation du nombre de trajets selon les mois de l’année ?
 
 **Hypothèse** :
 
@@ -322,7 +322,7 @@ Cette hausse s’explique sans doute par les vacances estivales et des condition
 À l'inverse, les trajets diminuent nettement en hiver, notamment entre décembre et février, où le nombre moyen redescend autour de 5 000 trajets en décembre.
 Cette baisse reflète un usage moindre du vélo durant les mois les plus froids de l'année.
 
-## Question 1
+## Question 2 : Quelle est la tendance générale de l'utilisation des vélos au cours de l'année ? 
 
 **Hypothèse** :
 
@@ -389,7 +389,7 @@ Cette semaine-là, on enregistre également des grelons, de la neige et de la pl
 
 Ces exemples nous amène à nous demander si une corrélation forte peut être associée entre la météo et l’utilisation des vélos.
 
-### Question 6 et 5 :  Quelles sont les durées moyennes de trajet ? Quels éléments influent sur cette durée ? (jour de la semaine, type d'utilisateur...)
+### Question 3:  Quelles sont les durées moyennes de trajet ? Quels éléments influent sur cette durée ? (jour de la semaine, type d'utilisateur...)
 
 **Hypothèse :**
 
@@ -446,7 +446,7 @@ Cela s'explique sûrement par l'utilisation différente des vélos : les gens le
 Concernant le type d'utilisateur, nos hypothèses étaient justes : les utilisateurs 'casual' se déplacent plus longtemps avec une moyenne de quasiement 30 min tandis que les utilisateurs 'members' utilisent les vélos pendant environ 12 minutes.
 Cela s'explique par le fait que les utilisateurs 'casual' font des balades, les utilisent pour visiter par exemple.
 
-### Question 4 et 5: Comment les différents types de vélos sont utilisés (type d''utilisateur, évolution...)
+### Question 4: Comment les différents types de vélos sont utilisés (type d''utilisateur, évolution...)
 
 **Quelle est l'évolution de l'usage des différents type de vélos ?**
 
@@ -553,7 +553,7 @@ Il y a donc probablement plus de trajets de membres avec des vélos classiques q
 On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent.
 Il n'y a pas vraiment de différence d'utilisation.
 
-### Question 16 : Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?
+### Question 5 : Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?
 
 **Hypothèse** :
 On peut supposer que les cyclistes occasionnels sont plus sensibles aux conditions météorologiques et aux périodes touristiques. Ainsi, leur fréquence d’utilisation augmenterait significativement pendant les saisons plus favorables comme le printemps et surtout l’été, où le climat est agréable et les activités extérieures sont privilégiées.
@@ -618,7 +618,7 @@ En revanche, le nombre de trajets est systématiquement plus élevé chez les ab
 
 Cela indique qu’il existe une base d’usagers réguliers bien plus importante, qui continue d’utiliser le service toute l’année, même en conditions moins favorables.
 
-### Question 17 : En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?
+### Question 6 : En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?
 
 **Hypothèse** :
 Les utilisateurs abonnés adoptent très probablement des comportements liés à leur routine quotidienne (trajets domicile-travail par exemple). Ils seraient donc plus susceptibles d’utiliser les vélos pendant les heures de pointe, notamment en début de matinée (trajet vers le travail) et en fin de journée (retour).
@@ -680,7 +680,7 @@ Ces résultats confirment que les abonnés sont des usagers réguliers qui utili
 
 # Utilisation des stations 
 
-### Question 3 : Quelles stations sont les plus utilisées pour les départs/arrivées ?
+### Question 7 : Quelles stations sont les plus utilisées pour les départs/arrivées ?
 
 **Hypothèse:**
 
@@ -1553,7 +1553,7 @@ Les stations situées près de sites naturels ou panoramiques (Gravelly Point, R
 # Lien avec la météo 
 
 
-### Question 6 : Est ce que les durées de trajets sont influencés par la météo ? 
+### Question 12 : Est ce que les durées de trajets sont influencés par la météo ? 
 
 **Hypothèse :**
 Nous supposons que la durée moyenne de trajet devrait être plus courte les jours de mauvais temps.
@@ -1628,7 +1628,7 @@ merged %>%
 
 On peut voir que les durées moyennes maximum sont atteintes vers 20-25 degrés de température, vers 20km/h de vent et quand il ne pleut pas. Cela signifie que les utilisateurs évitent de faire des grands trajets quand les conditions ne sont pas optimales.
 
-### Question 14 
+### Question 13 : Comment la météo influence-t-elle l'usage des vélos ?  
 
 **Hypothèse**
 
@@ -1687,7 +1687,7 @@ La deuxième visualisation met en relation la couverture nuageuse et la durée m
 La troisième visualisation met en relation la neige et la durée moyenne des trajets afin d'observer si la neige a un impact sur l'utilisation des vélos des usagers. La grande majorité des observations se trouvent à 0 de neige, où la durée moyenne des trajets est très variable, avec plusieurs points extrêmes où la durée dépasse 100 minutes. Ceci peut s'expliquer parce que il y a pas beaucoup de moments où il y a de la neuge, ainsi la plupart de smesures ont été faites lorsque neige est à 0.
 En présence de neige : Dès qu'il y a présence de neige (valeurs supérieures à 0), le nombre d'observations diminue fortement et la durée moyenne des trajets semble globalement plus faible ou relativement stable, entre 20 et 40 minutes pour la plupart des points.
 
-### Question 12 
+### Suite question 13 
 
 **Hypothèse** :
 Comme on l'a vu précédemment en question 1, les vélos sont moins utilisés en hiver, sûrement parce qu'il fait plus froid. On souhaite maintenant voir de manière plus précise la relation entre la météo (température, pluie) sur l'influence de l'usage des vélos partagés. Ces 2 visulisations permettront d'avoir une perspective approfondie des manières dont les conditons météorologiques impactent l'utilisation.
@@ -1729,7 +1729,7 @@ La première visualisation est un nuage de point représentant le nombre de traj
 
 La deuxième visualisation est elle aussi un nuage de points représentant le nombre de trajets par jour en fonction de la précipitation (en mm). On a aussi ajouté une courbe de régression en bleu montrant la tendance générale. A la différence de la première visualisation, la corrélation entre l'utilisation des vélos et les précipitations est négative. Le résultat est plutôt cohérent, personne n'aime faire du vélo sous la pluie. Comme pour la première visualisation, les points sont dispersés autour de la droite de régression montrant potentiellement l'importance d'autre facteur dans l'utilisation des vélos.
 
-### Question 13
+### Question 14
 
 **En cas de température extrême, est-ce que le volume de trajets diminue fortement ?**
 
@@ -1932,7 +1932,9 @@ On peut voir que contrairement à nos hypothèses que le mauvais temps affecte q
 On peut voir également que finalement, les utilisateurs en règle générale ne sont pas très affectés par la météo, environ 45% des trajets sont réalisés sous mauvais temps.
 
 
-### Question 18 : 
+## Question bonus 
+
+### Question 16 : Est-ce qu'il est possible de voir une différence d'utilisation des vélos lors de la prise du Capitol le 6 janvier 2021 ? 
 
 **Hypothèse**
 
@@ -2091,4 +2093,8 @@ Les emplacements du Capitole et du Washington Monument sont signalés pour repé
 
 On peut observer que les stations au nord de la Pennsylvania Avenue (avenue utilisée par les manifestants) ont des utilisations qui ont augmentées comparé à la normale. Les 3 stations avec les plus grosses augmentations autour de l'avenue sont "17th & G St NW", "10th & G St NW", et "4th & D St NW / Judiciary Square".
 En voyant la visualisation on remarque qu'il existe des augmentations inhabituelles autour de l'avenue potentiellement lié à la manifestation mais cependant il est difficile d'établir un lien direct.
+
+
+## Conclusion
+
 
