@@ -684,14 +684,19 @@ Ces résultats confirment que les abonnés sont des usagers réguliers qui utili
 
 ### Question 7 : Quelles stations sont les plus utilisées pour les départs/arrivées ?
 
-**Hypothèse:**
+Pour cette analyse fondamentale, nous avons voulu identifier les stations centrales du système Capital Bikeshare en examinant leur fréquentation absolue. Cette question constitue un préalable essentiel pour comprendre la hiérarchie spatiale du réseau et formuler des hypothèses sur les facteurs géographiques qui déterminent l'attractivité des stations.
 
-Il serait intéréssant d'étudier quelles sont les stations les plus utilisées pour les départs et les arrivées.
-On peut supposer que ce sera relativement les mêmes pour les départs et les arrivées, et qu'elles seront à côté de secteurs dynamiques (gares, centre commerciaux, business center...)
+Notre hypothèse initiale supposait une correspondance entre les stations les plus utilisées pour les départs et les arrivées, avec une localisation privilégiée près de secteurs dynamiques (gares, centres commerciaux, quartiers d'affaires). Cette hypothèse reflète l'idée d'un équilibre global du système malgré des flux directionnels ponctuels.
+
+Pour tester cette hypothèse, nous avons :
+- Compté le nombre total de départs et d'arrivées par station
+- Identifié le top 10 de chaque catégorie
+- Comparé les deux classements pour évaluer leur correspondance
+- Analysé la localisation géographique des stations dominantes
 
 **Graphique**
 
-```{r}
+```{r Q7_1}
 
 top_depart <- df %>%
   dplyr::filter(!is.na(start_station_name)& start_station_name != "") %>%
@@ -735,7 +740,7 @@ Pour répondre à cette question nous allons tracer ces stations sur une carte p
 
 **Graphique**
 
-```{r}
+```{r Q7_2}
 
 top_depart_coords <- df %>%
   filter(!is.na(start_station_name), start_station_name != "") %>%
@@ -777,15 +782,14 @@ leaflet(top_end_coords) %>%
   addLegend("bottomright", colors = "red", labels = "Stations d'arrivées", title = "Top 10")
 
 ```
+
 **Interprétation** :
 
 Les stations Lincoln Memorial, Jefferson Dr & 14th St SW et 4th St & Madison Dr NW sont localisés près du National Mall, qui est une zone très touristique de Washington.\
 Ensuite, la station Columbus Circle/Union Station est devant l'Union Station qui est un grand hub de transport (métro, gare routière, gare...)\
 Les autres stations sont dans des quartiers résidentiels ou des zones de bureaux très denses.
 
-
-
-
+Cette identification des stations centrales soulève une question d'usage : ces volumes élevés correspondent-ils à des profils d'utilisation spécifiques ? L'analyse des durées de trajets par station permettra de comprendre si les stations les plus fréquentées sont utilisées pour des trajets courts (transit) ou longs (récréation).
 
 ### Question 8 :
 
@@ -890,17 +894,185 @@ ggplot(df_heat_top_filtre, aes(x = heure_end, y = reorder(end_station_name, desc
 
 **Interprétation**
 
-L'analyse des heatmaps représentant l'activité des stations de départ et d'arrivée en fonction de l'heure de la journée révèle des modèles d'utilisation intéressants.
-Les stations les plus actives varient en fonction de l'heure, avec des pics d'activité pendant les heures de pointe (7-9h et 16-18h).
+L'analyse des heatmaps représentant l'activité des stations de départ et d'arrivée en fonction de l'heure de la journée révèle des modèles d'utilisation distincts qui dessinent la géographie fonctionnelle de Washington D.C.
 
-L'analyse des stations révèle deux profils d'utilisation distincts.
-"New Hampshire Ave & T St NW", entourée de logements sans parking, présente un pic d'activité le matin pour les départs et le soir pour les arrivées, caractéristique d'un flux pendulaire marqué.
-"Columbus Circle/Union Station", connectée aux transports en commun, montre une utilisation dominante aux heures de pointe, liée aux horaires de travail.
+Les stations révèlent deux profils d'utilisation bien différenciés. "New Hampshire Ave & T St NW" et "Columbus Circle/Union Station" présentent des pics d'activité marqués pendant les heures de pointe (7-9h pour les départs, 17-19h pour les arrivées), caractéristiques d'un flux pendulaire prononcé. Cette asymétrie temporelle témoigne d'une utilisation principalement liée aux déplacements domicile-travail, où les résidents utilisent ces stations comme points de départ matinaux vers le centre-ville et points d'arrivée lors du retour en soirée.
 
-À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, connaissent une activité plus étalée sur la journée, avec un pic en milieu de journée.
-Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
+À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW" montrent une activité plus étalée sur la journée avec des pics en milieu de journée (11h-15h). Cette distribution reflète leur fonction récréative et touristique, où l'utilisation suit les rythmes de visite plutôt que les contraintes professionnelles. L'activité soutenue en milieu de journée confirme leur attrait pour les touristes et les activités de loisir.
 
-Les autres stations, comme "5th & K St NW", suivent également un schéma professionnel avec une activité concentrée autour des heures de pointe, reflétant une utilisation principalement liée aux déplacements domicile-travail.
+**Les deux cartes interactives ci-dessous enrichissent cette analyse en révélant la dimension spatiale de ces patterns temporels :**
+
+```{r Q8_map_1}
+df_2024 <- df %>%
+  filter(year(started_at) == 2024)
+
+# Calculer l'activité des stations (départs)
+station_activity <- df_2024 %>%
+  mutate(heure = hour(started_at)) %>%
+  # Filtrer pour ne garder que les stations avec coordonnées valides
+  filter(!is.na(start_lat) & !is.na(start_lng)) %>%
+  group_by(start_station_name, start_lat, start_lng) %>%
+  summarise(
+    nb_trajets = n(),
+    # Heure de pointe du matin (6h-9h)
+    matin = sum(heure >= 6 & heure <= 10),
+    # Heure de pointe du soir (16h-19h)
+    soir = sum(heure >= 16 & heure <= 20),
+    # Milieu de journée (10h-15h)
+    journee = sum(heure >= 11 & heure <= 15),
+    .groups = "drop"
+  ) %>%
+  # Calculer quelle période a le plus de trajets
+  # Avec une condition supplémentaire pour "Matin et Soir"
+  mutate(
+    # Calculer la différence relative entre matin et soir
+    diff_matin_soir = abs(matin - soir) / pmax(matin, soir),
+    
+    peak_period = case_when(
+      # Si matin et soir sont proches (moins de 15% de différence) et plus grands que journée
+      diff_matin_soir <= 0.15 & matin > journee & soir > journee ~ "Matin et Soir",
+      matin > soir & matin > journee ~ "Matin (6h-10h)",
+      soir > matin & soir > journee ~ "Soir (16h-20h)",
+      journee > matin & journee > soir ~ "Journée (11h-15h)",
+      TRUE ~ "Équilibré"
+    )
+  ) %>%
+  # Filtrer pour garder les stations les plus actives (top 50)
+  top_n(50, nb_trajets)
+
+# Définir une palette de couleurs pour les périodes de pointe avec la nouvelle catégorie
+period_colors <- colorFactor(
+  palette = c("blue", "green", "red", "orange", "purple"),
+  domain = c("Matin (6h-10h)", "Journée (11h-15h)", "Soir (16h-20h)", "Matin et Soir", "Équilibré")
+)
+
+# Créer la carte
+map <- leaflet(station_activity) %>%
+  addTiles() %>%  # Ajouter la carte de base OpenStreetMap
+  addCircleMarkers(
+    ~start_lng, ~start_lat,
+    color = ~period_colors(peak_period),
+    radius = ~sqrt(nb_trajets)/10,  # Taille basée sur le nombre de trajets
+    fillOpacity = 0.7,
+    stroke = TRUE,
+    weight = 1,
+    popup = ~paste(
+      "<b>", start_station_name, "</b><br/>",
+      "Total trajets: ", nb_trajets, "<br/>",
+      "Pic d'activité: ", peak_period, "<br/>",
+      "Matin (6h-10h): ", matin, " trajets<br/>",
+      "Journée (11h-15h): ", journee, " trajets<br/>",
+      "Soir (16h-20h): ", soir, " trajets"
+    ),
+    # Option pour améliorer l'interaction
+    options = markerOptions(riseOnHover = TRUE)
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = period_colors,
+    values = ~peak_period,
+    title = "Pic d'activité",
+    opacity = 0.7
+  )
+
+# Afficher la carte
+map
+
+
+```
+
+
+```{r Q8_map_2}
+df_2024 <- df %>%
+  filter(year(ended_at) == 2024)
+
+# Calculer l'activité des stations (départs)
+station_activity <- df_2024 %>%
+  mutate(heure = hour(ended_at)) %>%
+  # Filtrer pour ne garder que les stations avec coordonnées valides
+  filter(!is.na(end_lat) & !is.na(end_lng)) %>%
+  group_by(end_station_name, end_lat, end_lng) %>%
+  summarise(
+    nb_trajets = n(),
+    # Heure de pointe du matin (6h-9h)
+    matin = sum(heure >= 6 & heure <= 10),
+    # Heure de pointe du soir (16h-19h)
+    soir = sum(heure >= 16 & heure <= 20),
+    # Milieu de journée (10h-15h)
+    journee = sum(heure >= 11 & heure <= 15),
+    .groups = "drop"
+  ) %>%
+  # Calculer quelle période a le plus de trajets
+  # Avec une condition supplémentaire pour "Matin et Soir"
+  mutate(
+    # Calculer la différence relative entre matin et soir
+    diff_matin_soir = abs(matin - soir) / pmax(matin, soir),
+    
+    peak_period = case_when(
+      # Si matin et soir sont proches (moins de 15% de différence) et plus grands que journée
+      diff_matin_soir <= 0.15 & matin > journee & soir > journee ~ "Matin et Soir",
+      matin > soir & matin > journee ~ "Matin (6h-10h)",
+      soir > matin & soir > journee ~ "Soir (16h-20h)",
+      journee > matin & journee > soir ~ "Journée (11h-15h)",
+      TRUE ~ "Équilibré"
+    )
+  ) %>%
+  # Filtrer pour garder les stations les plus actives (top 50)
+  top_n(50, nb_trajets)
+
+# Définir une palette de couleurs pour les périodes de pointe avec la nouvelle catégorie
+period_colors <- colorFactor(
+  palette = c("blue", "green", "red", "orange", "purple"),
+  domain = c("Matin (6h-10h)", "Journée (11h-15h)", "Soir (16h-20h)", "Matin et Soir", "Équilibré")
+)
+
+# Créer la carte
+map <- leaflet(station_activity) %>%
+  addTiles() %>%  # Ajouter la carte de base OpenStreetMap
+  addCircleMarkers(
+    ~end_lng, ~end_lat,
+    color = ~period_colors(peak_period),
+    radius = ~sqrt(nb_trajets)/10,  # Taille basée sur le nombre de trajets
+    fillOpacity = 0.7,
+    stroke = TRUE,
+    weight = 1,
+    popup = ~paste(
+      "<b>", end_station_name, "</b><br/>",
+      "Total trajets: ", nb_trajets, "<br/>",
+      "Pic d'activité: ", peak_period, "<br/>",
+      "Matin (6h-10h): ", matin, " trajets<br/>",
+      "Journée (11h-15h): ", journee, " trajets<br/>",
+      "Soir (16h-20h): ", soir, " trajets"
+    ),
+    # Option pour améliorer l'interaction
+    options = markerOptions(riseOnHover = TRUE)
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = period_colors,
+    values = ~peak_period,
+    title = "Pic d'activité",
+    opacity = 0.7
+  )
+
+# Afficher la carte
+map
+```
+
+La carte des départs met en évidence la typologie fonctionnelle des quartiers :
+
+- Stations bleues (pic matin 6h-10h) : localisées dans les zones résidentielles périphériques, elles confirment leur rôle de "gares de départ" pour les trajets pendulaires
+- Stations orange (matin et soir) : situées dans des zones mixtes résidentiel/commercial, elles témoignent d'une double fonction dans les flux urbains
+- Stations vertes (pic journée) : concentrées autour des sites touristiques et institutionnels
+
+La carte des arrivées révèle les zones d'attraction urbaine :
+
+- Stations rouges (pic soir 16h-20h) : marquent les destinations de retour vers les quartiers résidentiels
+- Stations vertes (pic journée) : confirment les pôles touristiques et de loisir comme destinations privilégiées en milieu de journée
+
+Cette double perspective géographique confirme l'hypothèse d'un système organisé autour de flux pendulaires structurés, avec des nuances selon la fonction urbaine des quartiers. La complémentarité spatiale entre les patterns de départ et d'arrivée illustre parfaitement les mouvements directionnels qui caractérisent la mobilité urbaine de Washington D.C.
+
+Après avoir identifié ces variations horaires d'activité et leur distribution géographique, il devient pertinent d'analyser comment ces patterns se différencient entre la semaine et le week-end. Cette analyse temporelle complémentaire nous permettra de distinguer plus finement les stations principalement utilisées pour les trajets domicile-travail de celles fréquentées pour des activités de loisirs, et de valider les hypothèses émises sur les profils fonctionnels des différentes zones de la capitale.
 
 ### Question 9 :
 
@@ -964,23 +1136,35 @@ ggplot(df_bar_top, aes(x = reorder(start_station_name, nb_trajets), y = nb_traje
 
 **Interprétation**
 
-L'analyse des stations révèle deux profils d'utilisation distincts.
-"New Hampshire Ave & T St NW", entourée de logements sans parking, génère le plus grand volume total avec des flux pendulaires marqués.
-"Columbus Circle/Union Station", connectée aux transports, montre une utilisation dominante en semaine (75%) liée aux horaires de travail.
+L'analyse comparative semaine/week-end confirme les profils fonctionnels identifiés dans l'analyse horaire et révèle trois typologies distinctes de stations.
 
-À l'opposé, "Lincoln Memorial" et "Jefferson Dr & 14th St SW", situées dans un même parc touristique près d'agences gouvernementales, présentent une forte proportion d'utilisation le week-end (40-45%).
-Cette différence s'explique par leur fonction récréative/touristique versus professionnelle.
+**Stations à vocation pendulaire** : Columbus Circle/Union Station (80% semaine) et New Hampshire Ave & T St NW (75% semaine) confirment leur rôle dans la mobilité professionnelle, avec une chute drastique d'activité le week-end caractéristique des flux domicile-travail.
 
-Les autres stations comme "5th & K St NW" suivent également un schéma professionnel avec une faible utilisation le week-end.
+**Stations touristiques** : Lincoln Memorial et Jefferson Dr & 14th St SW se distinguent par une utilisation week-end exceptionnellement élevée (35-40%), validant leur vocation récréative identifiée lors de l'analyse des pics horaires en milieu de journée.
+
+**Stations mixtes** : Les autres stations présentent des profils intermédiaires (20-25% week-end) reflétant leur positionnement géographique entre zones résidentielles et d'attraction.
+
+Cette segmentation temporelle valide parfaitement la géographie fonctionnelle observée précédemment : les stations à pics matinaux/vespéraux correspondent aux profils pendulaires, tandis que celles à activité étalée en journée maintiennent une utilisation week-end soutenue.
+
+Ces différences d'usage selon les périodes créent-elles des déséquilibres géographiques durables dans le système ? L'analyse des flux directionnels devient cruciale pour comprendre si cette spécialisation fonctionnelle génère des contraintes opérationnelles de redistribution des vélos.
 
 ### Question 10 :
 
 **Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?**
 
+Pour cette analyse, nous avons cherché à identifier les stations présentant des asymétries importantes entre le nombre de trajets qui y débutent et ceux qui s'y terminent. Cette question prolonge naturellement l'analyse des profils temporels en révélant les conséquences directionnelles des patterns d'usage identifiés précédemment.
+
+Notre approche a consisté à calculer la différence nette entre départs et arrivées pour chaque station. Pour cela, nous avons :
+
+- Calculé le nombre total de départs et d'arrivées par station
+- Déterminé la différence nette (départs - arrivées)
+- Filtré les stations avec plus de 200 trajets pour assurer la significativité
+- Identifié les 15 stations présentant les déséquilibres les plus marqués
+- Catégorisé les stations selon leur type de déséquilibre
+
 ```{r Q10 ,warning=FALSE}
 
-prepare_balance_data <- function(df_usage, top_n = 20) {
-  df_usage %>%
+station_balance <- df_usage %>%
     group_by(station_name) %>%
     summarise(
       total_departures = sum(pickup_counts, na.rm = TRUE),
@@ -991,36 +1175,20 @@ prepare_balance_data <- function(df_usage, top_n = 20) {
       total_activity = total_departures + total_arrivals,
       net_difference = total_departures - total_arrivals,
       percent_imbalance = round(100 * net_difference / total_activity, 1),
-      
-      # Classification du déséquilibre
-      balance_type = case_when(
-        percent_imbalance > 15  ~ "Forte dominance\ndéparts",
-        percent_imbalance > 5   ~ "Dominance\ndéparts", 
-        percent_imbalance < -15 ~ "Forte dominance\narrivées",
-        percent_imbalance < -5  ~ "Dominance\narrivées",
-        TRUE ~ "Équilibré"
-      ),
-      
-      # Direction du déséquilibre pour les couleurs
       balance_direction = ifelse(net_difference > 0, "Surplus départs", "Surplus arrivées")
     ) %>%
-    # Filtrer les stations avec activité significative
     filter(total_activity >= 200) %>%
-    # Sélectionner les plus déséquilibrées
     arrange(desc(abs(net_difference))) %>%
-    head(top_n) %>%
-    # Réorganiser pour le graphique (du plus déséquilibré au moins)
+    head(15) %>%
     mutate(
-      # Raccourcir les noms longs manuellement si stringr pose problème
-      station_name_short = ifelse(
-        nchar(station_name) > 30,
-        paste0(substr(station_name, 1, 27), "..."),
+      # Raccourcir les noms sans stringr
+      station_name_display = ifelse(
+        nchar(station_name) > 35,
+        paste0(substr(station_name, 1, 32), "..."),
         station_name
-      ),
-      station_name_short = factor(station_name_short, 
-                                 levels = station_name_short[order(abs(net_difference))])
-    )
-}
+      )
+    ) %>%
+    arrange(abs(net_difference))  # Pour l'ordre dans le graphique
 
 # 2. CRÉATION DU BARPLOT PRINCIPAL ----
 create_balance_barplot <- function(balance_data) {
@@ -1092,7 +1260,6 @@ create_balance_barplot <- function(balance_data) {
 }
 
 
-
 # Graphique principal
 main_plot <- create_balance_barplot(station_balance)
 print(main_plot)
@@ -1100,22 +1267,35 @@ print(main_plot)
 
 **Interprétation**
 
-L'analyse des déséquilibres départs/arrivées révèle une géographie fonctionnelle marquée du système Capital Bikeshare, illustrant parfaitement les flux de mobilité directionnels qui caractérisent la structure urbaine de Washington DC. Cette cartographie des asymétries dévoile deux types de stations aux rôles bien distincts : les stations "sources" génératrices de trajets et les stations "puits" d'attraction.
+L'analyse des déséquilibres départs/arrivées révèle une géographie fonctionnelle polarisée qui confirme et amplifie les observations des analyses temporelles précédentes.
 
-Les stations à surplus de départs dessinent clairement la carte des quartiers résidentiels et périphériques de la capitale.
-11th & Kenyon St NW domine largement avec un excédent de 21 867 départs, suivie de près par Park Rd & Holmead Pl NW (+21 573), toutes deux situées dans les zones résidentielles du Nord-Ouest.
-Ces stations fonctionnent comme des "gares de départ" matinales où les résidents entament leurs trajets vers le centre-ville, créant un flux sortant massif qui nécessite un réapprovisionnement constant en vélos.
-L'amplitude de ces déséquilibres, dépassant les 20 000 trajets, témoigne de l'intensité des mouvements pendulaires quotidiens et de l'appropriation du vélo-partage comme solution de premier/dernier kilomètre.
+**Stations "sources" résidentielles** : Les stations à surplus de départs dessinent clairement la carte des quartiers résidentiels. 11th & Kenyon St NW (+21 667) et Park Rd & Holmead Pl NW (+21 573) dominent largement, confirmant leur rôle de "gares de départ" matinales identifié dans l'analyse horaire. Ces déséquilibres massifs témoignent des flux pendulaires sortants vers le centre-ville et créent un besoin constant de réapprovisionnement en vélos.
 
-À l'inverse, les stations déficitaires en départs se concentrent dans les zones d'attraction touristique et commerciale, révélant leur statut de destinations privilégiées.
-Georgetown Harbor / 30th St NW (-16 061) et C & O Canal & Wisconsin Ave NW (-13 901) capturent massivement les arrivées sans générer proportionnellement de départs, confirmant leur rôle de terminus pour les visiteurs découvrant le front de mer historique de Georgetown.
-Ces stations "puits" accumulent les vélos en fin de parcours touristique, créant un défi logistique
+**Stations "puits" touristiques** : À l'opposé, Georgetown Harbor / 30th St NW (-16 061) et C & O Canal & Wisconsin Ave NW (-13 901) capturent massivement les arrivées sans générer proportionnellement de départs. Ces stations, situées dans la zone touristique de Georgetown, confirment leur statut de destinations privilégiées identifié par leur forte activité week-end dans l'analyse précédente.
+
+Validation des profils fonctionnels : Cette cartographie des déséquilibres valide parfaitement les typologies établies :
+
+- Les stations à profil pendulaire (forte aktivité en semaine, pics matin/soir) génèrent des surplus de départs
+- Les stations touristiques (activité week-end élevée, pics journée) accumulent les arrivées
+- L'amplitude des déséquilibres (>20 000 trajets) révèle l'intensité des flux directionnels urbains
+Implications opérationnelles : Ces asymétries créent des défis logistiques majeurs, nécessitant une redistribution quotidienne des vélos des zones de destination vers les zones de départ pour maintenir l'équilibre du système.
+
+Ces déséquilibres géographiques soulèvent une question complémentaire : quels sont les trajets spécifiques qui alimentent ces flux directionnels ? L'identification des liaisons les plus fréquentes permettra de cartographier précisément les "autoroutes cyclables" de Washington D.C. et de comprendre les mécanismes concrets de ces asymétries spatiales.
 
 ### Question 11 :
 
 **Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée)**
 
-```{r Q11_1 ,warning=FALSE}
+Pour cette analyse, nous avons voulu identifier les liaisons spécifiques qui alimentent les flux observés précédemment et comprendre la nature des trajets les plus populaires. Cette question complète parfaitement l'analyse des déséquilibres en révélant les "autoroutes cyclables" concrètes de Washington D.C.
+
+Notre approche a consisté à analyser tous les trajets point-à-point pour identifier les patterns de circulation. Pour cela, nous avons :
+
+- Calculé la fréquence de chaque paire origine-destination
+- Distingué les trajets "en boucle" (même station de départ et d'arrivée) des trajets "directionels"
+- Analysé la distribution des durées pour comprendre les usages
+- Identifié les top 10 de chaque catégorie
+
+```{r Q11_1,warning=FALSE}
 # 1. Calculer les trajets les plus fréquents
 top_routes <- df %>%
   # Filtrer les lignes avec des noms de stations valides
@@ -1288,7 +1468,7 @@ La réciprocité quasi-parfaite des flux (8 196 et 8 177 trajets entre Lincoln M
 
 Maintenant que nous avons identifié la nature particulière des trajets en boucle, analysons plus précisément leurs caractéristiques temporelles pour comprendre les comportements d'usage qui les motivent
 
-**Distribution des temps de trajet" (en pourcentages)** \n Distribution du temps de trajet pour les trajets ayant le meme point de depart et d'arriver <https://capitalbikeshare.com/pricing>
+**Distribution des temps de trajet" (en pourcentages)** \n Distribution du temps de trajet pour les trajets ayant le meme point de depart et d'arriver \ <https://capitalbikeshare.com/pricing>
 
 ```{r Q11_3,warning=FALSE}
 
@@ -1368,21 +1548,6 @@ plot_line_percentage <- ggplot(line_data, aes(x = duration_interval, y = percent
   )
 
 print(plot_line_percentage)
-
-# 7. Statistiques pour les points clés
-cat("=== Points clés de la distribution ===\n")
-
-# Trouver les pics de la distribution
-peak_interval <- line_data[which.max(line_data$n), ]
-cat("Pic principal:", peak_interval$duration_interval, "-", peak_interval$duration_interval + 5, 
-    "minutes (", peak_interval$n, "trajets,", peak_interval$percentage, "%)\n")
-
-# Statistiques aux seuils
-seuil_45 <- line_data %>% filter(duration_interval <= 45) %>% summarise(total = sum(percentage))
-seuil_75 <- line_data %>% filter(duration_interval <= 75) %>% summarise(total = sum(percentage))
-
-cat("Trajets ≤ 45min:", round(seuil_45$total, 1), "%\n")
-cat("Trajets ≤ 75min:", round(seuil_75$total, 1), "%\n")
 
 ```
 
@@ -1519,25 +1684,6 @@ plot_stacked <- ggplot(stacked_data,
 
 print(plot_stacked)
 
-# 4. Statistiques globales pour les 3 catégories
-cat("=== Analyse des 3 catégories de durée ===\n")
-
-global_stats <- same_station_rides %>%
-  summarise(
-    total_trajets = sum(nombre_trajets_meme_station),
-    total_45min_moins = sum(trajets_45min_moins),
-    total_45min_75min = sum(trajets_45min_75min),
-    total_75min_plus = sum(trajets_75min_plus),
-    
-    prop_45min_moins = round(100 * total_45min_moins / total_trajets, 1),
-    prop_45min_75min = round(100 * total_45min_75min / total_trajets, 1),
-    prop_75min_plus = round(100 * total_75min_plus / total_trajets, 1)
-  )
-
-cat("Total trajets aller-retour:", global_stats$total_trajets, "\n")
-cat("≤45min:", global_stats$total_45min_moins, "(", global_stats$prop_45min_moins, "%)\n")
-cat("45-75min:", global_stats$total_45min_75min, "(", global_stats$prop_45min_75min, "%)\n") 
-cat(">75min:", global_stats$total_75min_plus, "(", global_stats$prop_75min_plus, "%)\n")
 ```
 
 **Interprétation**
@@ -1550,7 +1696,6 @@ Cependant, certaines stations comme Jefferson Dr & 14th St SW, Smithsonian-Natio
 
 Les stations situées près de sites naturels ou panoramiques (Gravelly Point, Roosevelt Island, National Harbor Carousel) montrent des durées plus variées, indiquant que les utilisateurs sont disposés à payer des frais additionnels pour profiter pleinement de ses environnements particuliers.
 À l'inverse, les stations plus urbaines et centrales (15th St & Pennsylvania Ave NW, Jefferson Memorial) présentent une concentration plus marquée dans la zone gratuite, suggérant un usage plus utilitaire ou des contraintes budgétaires plus strictes pour ces localisations.
-
 
 # Lien avec la météo 
 
