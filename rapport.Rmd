@@ -186,11 +186,15 @@ Cette analyse vise à fournir des insights pertinents pour les décideurs public
 ### Importation du jeu de données et des librairies
 
 ```{r Importation_Packages, echo=FALSE, include=FALSE}
-library(readr)
+library(readr);
+library(leaflet);
 library(ggplot2); 
 library(dplyr); 
 library(lubridate);
-require('utils')
+require('utils');
+library(RColorBrewer);
+library(forcats);
+library(stringr);
 options(ggplot2.discrete.fill = RColorBrewer::brewer.pal(4, "Set2"))
 options(ggplot2.continous.fill = RColorBrewer::brewer.pal(4, "PuBu"))
 
@@ -198,8 +202,9 @@ options(ggplot2.continous.fill = RColorBrewer::brewer.pal(4, "PuBu"))
 
 ```{r}
 #importation du jeu de données
-df <- 
-weather <- 
+df <- read_csv("data/daily_rent_detail.csv")
+weather <- read_csv("data/weather.csv")
+df_usage <- read_csv("data/usage_frequency.csv")
 ```
 
 # Utilisation générale des vélos 
@@ -225,8 +230,12 @@ Nous imaginons que les utilisateurs empruntent davantage les vélos en semaine (
 **Graphique** :
 
 ```{r}
-# Préparation des données avg_rides_per_day <-
-df %>%transmute(day_of_week = wday(started_at, label = TRUE, abbr = FALSE, week_start = 1), date = as_date(started_at)) %>%
+# Préparation des données
+avg_rides_per_day <- df %>%
+  transmute(
+    day_of_week = wday(started_at, label = TRUE, abbr = FALSE, week_start = 1),
+    date = as_date(started_at)
+  ) %>%
   # on garde la date et le jour correspondant
   group_by(date, day_of_week) %>%
   # un groupe = une date unique avec son jour
@@ -234,11 +243,15 @@ df %>%transmute(day_of_week = wday(started_at, label = TRUE, abbr = FALSE, week_
   group_by(day_of_week) %>%
   summarise(avg_per_day = mean(daily_count))
 
-# Visualisation avg_rides_per_day %>%
-ggplot(aes(x = day_of_week, y = avg_per_day)) +
+# Visualisation
+avg_rides_per_day %>%
+  ggplot(aes(x = day_of_week, y = avg_per_day)) +
   geom_col(fill = "blue") +
-  labs(title = "Nombre moyen de trajets par jour de la semaine",
-       x = "Jour de la semaine",y = "Nombre moyen de trajets") + 
+  labs(
+    title = "Nombre moyen de trajets par jour de la semaine",
+    x = "Jour de la semaine",
+    y = "Nombre moyen de trajets"
+  ) + 
   scale_y_continuous(breaks = seq(6000, 12000, by = 1000)) +
   coord_cartesian(ylim = c(6000, NA)) + 
   # Limite inférieure à 6000    
@@ -296,7 +309,8 @@ Nous supposons que la fréquentation des vélos est plus importante en été, en
 
 **Graphique** :
 
-```{r} # Préparation des données}
+```{r}
+# Préparation des données
 avg_rides_per_month <- df %>%
   transmute(months = month(started_at, label = TRUE, abbr = FALSE), date = as_date(started_at)) %>%
   # on garde la date et le mois correspondant   
@@ -307,9 +321,12 @@ avg_rides_per_month <- df %>%
   summarise(avg_per_month = mean(monthly_count))  
 
   # Visualisation avg_rides_per_month %>%   
-  ggplot(aes(x = months, y = avg_per_month)) + 
+avg_rides_per_month %>%   
+  ggplot(aes(x = months, y = avg_per_month)) +  # Le pipe %>% était manquant
   geom_col(fill = "blue") +  
-  labs(title = "Nombre moyen de trajets par mois de l'année",x = "Mois", y = "Nombre moyen de trajets") +
+  labs(title = "Nombre moyen de trajets par mois de l'année",
+       x = "Mois", 
+       y = "Nombre moyen de trajets") +
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
@@ -1783,6 +1800,7 @@ On s'intéresse maitenant à d'autres facteurs météorologiques comme le vent, 
 
 **Graphique**
 ```{r Q14, echo=FALSE}
+df$date <- as.Date(df$started_at)
 # Calcul de la durée moyenne des trajets par jour
 df_duree <- df %>%
   group_by(date) %>%
@@ -2243,5 +2261,4 @@ En voyant la visualisation on remarque qu'il existe des augmentations inhabituel
 
 
 ## Conclusion
-
 
