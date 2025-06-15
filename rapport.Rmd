@@ -218,8 +218,8 @@ df_usage <- read_csv("data/usage_frequency.csv")
 Pour cette analyse, nous avons choisi de ne conserver que la variable started_at, qui indique le moment précis où chaque vélo a été emprunté.
 À partir de cette information temporelle, nous avons dérivé d’autres variables selon les questions que nous souhaitions étudier :
 
--   Pour la question 2a, nous avons utilisé la fonction wday() du package lubridate afin d’extraire le jour de la semaine correspondant à chaque date.
--   Pour la question 2b, nous avons extrait le mois grâce à la fonction month().
+-   Pour la question 1a, nous avons utilisé la fonction wday() du package lubridate afin d’extraire le jour de la semaine correspondant à chaque date.
+-   Pour la question 1b, nous avons extrait le mois grâce à la fonction month().
 
 Ces transformations nous ont permis de comprendre l’évolution du nombre d’emprunts selon les moments de la semaine ou de l’année.
 
