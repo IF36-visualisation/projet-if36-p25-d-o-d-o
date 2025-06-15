@@ -1724,7 +1724,7 @@ Les stations situées près de sites naturels ou panoramiques (Gravelly Point, R
 
 # Lien avec la météo 
 
-### Question 12: Est-ce que la météo impacte l'usage des vélos ? 
+### Question 12: Comment la météo inuence-t-elle l’usage des vélos ? (pluie, température, vent, etc…)
 
 **Hypothèse** :
 Comme on l'a vu précédemment en question 1, les vélos sont moins utilisés en hiver, sûrement parce qu'il fait plus froid. On souhaite maintenant voir de manière plus précise la relation entre la météo (température, pluie) sur l'influence de l'usage des vélos partagés. Ces 2 visulisations permettront d'avoir une perspective approfondie des manières dont les conditons météorologiques impactent l'utilisation.
@@ -2045,7 +2045,7 @@ merged %>%
 
 **Interprétation**
 
-Sur ce graphique, nous avons représenté les jours de mauvais temps par les jours où il y a soit plus de 1mm de précipitation soit plus de 25km/h de vent.\
+Sur ce graphique, nous avons représenté les jours de mauvais temps par les jours où il y a soit plus de 1mm de précipitation soit plus de 25km/h de vent.
 On peut voir que contrairement à nos hypothèses que le mauvais temps affecte quasiement autant les utilisateurs réguliers que les utilisateurs occasionnels.
 On peut voir également que finalement, les utilisateurs en règle générale ne sont pas très affectés par la météo, environ 45% des trajets sont réalisés sous mauvais temps.
 
