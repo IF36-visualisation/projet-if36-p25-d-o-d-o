@@ -1746,7 +1746,7 @@ df_meteo <- inner_join(df_quotidien, weather, by = c("date" = "datetime"))
 # Visualisation 1 : Température maximale et nombre de trajets par jour
 ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  geom_smooth(method = "lm", se = FALSE, color = my_colors[1]) +
   labs(title = "Relation entre le nombre de trajets par jour et la température maximale",
        x = "Température maximale (°C)", y = "Nombre de trajets par jour") +
   theme_minimal()
@@ -1754,7 +1754,7 @@ ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
 # Visualisation 2 : Précipitations et nombre de trajets par jour
 ggplot(df_meteo, aes(x = precipcover, y = nb_trajets)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  geom_smooth(method = "lm", se = FALSE, color = my_colors[2]) +
   labs(title = "Relation entre le nombre de trajets par jour et les précipitations",
        x = "Précipitations (mm)", y = "Nombre de trajets par jour") +
   theme_minimal()
@@ -1790,7 +1790,7 @@ merged <- daily_avg %>%
 merged %>%
   ggplot(aes(x = temp, y = mean_duration)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = "loess", se = FALSE, color = "black") +
+  geom_smooth(method = "loess", se = FALSE, color = my_colors[1]) +
   labs(
     title = "Durée moyenne des trajets selon la température",
     x = "Température moyenne (°C)",
@@ -1802,7 +1802,7 @@ merged %>%
 merged %>%
   ggplot(aes(x = cloudcover, y = mean_duration)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = "black", se = FALSE) +
+  geom_smooth(method = "loess", color = my_colors[2], se = FALSE) +
   labs(
     title = "Durée moyenne selon la couverture nuageuse",
     x = "Couverture nuageuse (%)",
@@ -1814,7 +1814,7 @@ merged %>%
 merged %>%
   ggplot(aes(x = precip, y = mean_duration)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = "black", se = FALSE) +
+  geom_smooth(method = "loess", color = my_colors[2], se = FALSE) +
   labs(
     title = "Durée moyenne selon les précipitations",
     x = "Précipitations (mm)",
@@ -1826,7 +1826,7 @@ merged %>%
 merged %>%
   ggplot(aes(x = windspeed, y = mean_duration)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = "black", se = FALSE) +
+  geom_smooth(method = "loess", color = my_colors[2], se = FALSE) +
   labs(
     title = "Durée moyenne selon la vitesse du vent",
     x = "Vitesse du vent",
@@ -1895,8 +1895,8 @@ plotQ13_froid1 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajet
   geom_smooth(data = df_tempextreme_froid_dec22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en décembre 2022",
     x = "Date", y = "Nombre de trajets par jour") +
-  scale_fill_manual(values = c("Période froide" = "blue", "Période normale" = "grey"), name = NULL) +
-  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  scale_fill_manual(values = c("Période froide" = my_colors[1], "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
   theme_minimal()
 
 #Visualisation 2 temp extreme froide
@@ -1905,8 +1905,8 @@ plotQ13_froid2 <- ggplot(df_tempextreme_froid_fev21, aes(x = date, y = nb_trajet
   geom_smooth(data = df_tempextreme_froid_fev21, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en février 2021",
     x = "Date", y = "Nombre de trajets par jour") +
-  scale_fill_manual(values = c("Période froide" = "blue", "Période normale" = "grey"), name = NULL) +
-  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  scale_fill_manual(values = c("Période froide" = my_colors[1], "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
   theme_minimal()
 
 plotQ13_froid1
@@ -1958,8 +1958,8 @@ plotQ13_chaud1 <- ggplot(df_tempextreme_chaud_may22, aes(x = date, y = nb_trajet
   geom_smooth(data = df_tempextreme_chaud_may22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes chaudes en mai 2022",
     x = "Date", y = "Nombre de trajets par jour") +
-  scale_fill_manual(values = c("Période chaude" = "blue", "Période normale" = "grey"), name = NULL) +
-  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  scale_fill_manual(values = c("Période chaude" = my_colors[1], "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
   theme_minimal()
 
 
@@ -1969,8 +1969,8 @@ plotQ13_chaud2 <- ggplot(df_tempextreme_chaud_july24, aes(x = date, y = nb_traje
   geom_smooth(data = df_tempextreme_chaud_july24, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes chaudes en juillet 2024",
     x = "Date", y = "Nombre de trajets par jour") +
-  scale_fill_manual(values = c("Période chaude" = "blue", "Période normale" = "grey"), name = NULL) +
-  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  scale_fill_manual(values = c("Période chaude" = my_colors[1], "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
   theme_minimal()
 
 
@@ -2086,8 +2086,8 @@ ggplot(df_prise_capitole, aes(x = date, y = nb_trajets)) +
   geom_smooth(data = df_prise_capitole, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de la prise du Capitole",
     x = "Date", y = "Nombre de trajets par jour") +
-  scale_fill_manual(values = c("Prise Capitole" = "blue", "Période normale" = "grey"), name = NULL) +
-  scale_color_manual(values = c("Courbe moyenne" = "red"), name = NULL) +
+  scale_fill_manual(values = c("Prise Capitole" = my_colors[1], "Période normale" = "grey"), name = NULL) +
+  scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
   theme_minimal()
 
 
@@ -2148,11 +2148,12 @@ comparaison <- capitole %>%
          diff_relative > -25) %>%                  # EXCLURE activité réduite
   arrange(desc(diff_relative))
 
-# Palette couleurs continue - Échelle de bleus
+# Palette couleurs continue
 palette_continue <- colorNumeric(
-  palette = c("#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"),
+  palette = brewer.pal(9, "Blues"),  # Palette continue de bleus
   domain = c(0, max(comparaison$diff_relative_scaled, na.rm = TRUE))
 )
+
 
 # Carte
 map_comparison <- leaflet(comparaison) %>%
