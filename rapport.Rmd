@@ -245,12 +245,12 @@ avg_rides_per_day <- df %>%
   # un groupe = une date unique avec son jour
   summarise(daily_count = n(), .groups = "drop") %>%
   group_by(day_of_week) %>%
-  summarise(avg_per_day = mean(daily_count))%>%
+  summarise(avg_per_day = mean(daily_count))
 
 # Visualisation
 avg_rides_per_day %>%
   ggplot(aes(x = day_of_week, y = avg_per_day)) +
-  geom_col(fill = "blue") +
+  geom_col(fill = my_colors[1]) +
   labs(
     title = "Nombre moyen de trajets par jour de la semaine",
     x = "Jour de la semaine",
@@ -322,12 +322,12 @@ avg_rides_per_month <- df %>%
   # un groupe = une date unique avec son mois   
   summarise(monthly_count = n(), .groups = "drop") %>%
   group_by(months) %>% 
-  summarise(avg_per_month = mean(monthly_count))%>%  
+  summarise(avg_per_month = mean(monthly_count)) 
 
-  # Visualisation avg_rides_per_month %>%   
+  # Visualisation avg_rides_per_month    
 avg_rides_per_month %>%   
   ggplot(aes(x = months, y = avg_per_month)) +  # Le pipe %>% était manquant
-  geom_col(fill = "blue") +  
+  geom_col(fill = my_colors[2]) +  
   labs(title = "Nombre moyen de trajets par mois de l'année",
        x = "Mois", 
        y = "Nombre moyen de trajets") +
@@ -380,7 +380,7 @@ ggplot() +
             color = "black") +
   geom_smooth(data = weather_semaine,
               aes(x = semaine, y = temp * facteur_trajet_temperature),
-              color = "lightcoral",
+              color = my_colors[2],
               method = "loess",
               span= 0.2,) +
   scale_y_continuous(
@@ -392,7 +392,7 @@ ggplot() +
   theme(
     plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
     plot.subtitle = element_text(size = 12, hjust = 0.5),
-    axis.title.y.right = element_text(color = "red")
+    axis.title.y.right = element_text(color = my_colors[2])
   )
 ```
 
@@ -436,7 +436,7 @@ df_duration %>%
   summarise(mean_duration = mean(ride_duration)) %>%
   
   ggplot(aes(x = day_of_week, y = mean_duration)) +
-  geom_col() +
+  geom_col(fill=my_colors[2]) +
   labs(
     title = "Durée moyenne des trajets par jour de la semaine",
     x = "Jour",
@@ -1746,7 +1746,7 @@ df_meteo <- inner_join(df_quotidien, weather, by = c("date" = "datetime"))
 # Visualisation 1 : Température maximale et nombre de trajets par jour
 ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = my_colors[1]) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
   labs(title = "Relation entre le nombre de trajets par jour et la température maximale",
        x = "Température maximale (°C)", y = "Nombre de trajets par jour") +
   theme_minimal()
@@ -1754,7 +1754,7 @@ ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
 # Visualisation 2 : Précipitations et nombre de trajets par jour
 ggplot(df_meteo, aes(x = precipcover, y = nb_trajets)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = my_colors[2]) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
   labs(title = "Relation entre le nombre de trajets par jour et les précipitations",
        x = "Précipitations (mm)", y = "Nombre de trajets par jour") +
   theme_minimal()
@@ -1790,7 +1790,7 @@ merged <- daily_avg %>%
 merged %>%
   ggplot(aes(x = temp, y = mean_duration)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = "loess", se = FALSE, color = my_colors[1]) +
+  geom_smooth(method = "loess", se = FALSE, color = "black") +
   labs(
     title = "Durée moyenne des trajets selon la température",
     x = "Température moyenne (°C)",
@@ -1802,7 +1802,7 @@ merged %>%
 merged %>%
   ggplot(aes(x = cloudcover, y = mean_duration)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = my_colors[2], se = FALSE) +
+  geom_smooth(method = "loess", color = "black", se = FALSE) +
   labs(
     title = "Durée moyenne selon la couverture nuageuse",
     x = "Couverture nuageuse (%)",
@@ -1814,7 +1814,7 @@ merged %>%
 merged %>%
   ggplot(aes(x = precip, y = mean_duration)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = my_colors[2], se = FALSE) +
+  geom_smooth(method = "loess", color = "black", se = FALSE) +
   labs(
     title = "Durée moyenne selon les précipitations",
     x = "Précipitations (mm)",
@@ -1826,7 +1826,7 @@ merged %>%
 merged %>%
   ggplot(aes(x = windspeed, y = mean_duration)) +
   geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = my_colors[2], se = FALSE) +
+  geom_smooth(method = "loess", color = "black", se = FALSE) +
   labs(
     title = "Durée moyenne selon la vitesse du vent",
     x = "Vitesse du vent",
