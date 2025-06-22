@@ -111,68 +111,38 @@ Nous utilisons 4 jeux de données pour analyser l’utilisation des vélos libre
 
 Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on peut catégoriser :
 
-1.  Utilisation générale des vélos
+**1.  Utilisation générale des vélos**
 
--   Combien de trajets sont effectués en moyenne par jour/mois ? **Graphique :** barplot du nombre de trajets par jour de la semaine, par mois de l’année\
-    **Variables :** Nombre de trajets, date d’emprunt
+-   Combien de trajets sont effectués en moyenne par jour/mois ? 
 -   Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?\
-    **Graphique :** Lineplot du nombre de trajet en fonction du temps\
-    **Variables :** Nombre de trajets, date
 -   Quelles sont les durées moyenne des trajets ? Varient-elles selon le jour de la semaine ou le type d'utilisateur ?\
-    **Graphique :** Boxplot ou violin plot\
-    **Variables :** Durée du trajet, type d’utilisateur, date
 -   Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ? Varie-t-il en fonction du type d'utilisateur ? \
-    **Graphique :** Barchart avec pourcentage/nombre de vélos par catégorie\
-    **Variables :** Type de vélo, Nombre de trajets par type de vélos, type d'utilisateur
 -   Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?\
-    **Graphique :** Lineplot par type d’utilisateur\
-    **Variables :** nombre de trajets, type d’utilisateurs, mois
 -   En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?\
-    **Graphique :** Lineplot (heure en abscisse et nombre de trajets en ordonnée)\
-    **Variables :** nombre de trajets, heure
 
-2.  Utilisation des stations
+**2.  Utilisation des stations**
 
 -   Quelles stations sont les plus utilisées pour les départs/arrivées ?\
-    **Graphique :** Carte avec points de taille différentes pour le nombre de départs/arrivées\
-    **Variables :** Nom des stations, Nombre de départs/arrivées, Coordonnées des stations
 -   Quelles stations sont les plus actives à différentes périodes de la journée (matin ou soir) ?\
-    **Graphique :** Heatmap avec X= heure, Y = station et couleur = nombre de trajets\
-    **Variables :** Heure, Nom de la station, Nombre de trajets
 -   Quelles sont les stations les plus utilisées le week-end, en semaine ?\
-    **Graphique :** Stacked barplot\
-    **Variables :** Jour de la semaine, nom station, nombre de trajets
 -   Existe-t-il des stations avec un fort déséquilibre entre départs et arrivées ?\
-    **Graphique :** Barplot (différence départ, arrivée)\
-    **Variables :** Nom de la station, Nombre de départs/arrivées
 -   Quels sont les trajets les plus fréquents (station de départ vers station d’arrivée) ?\
-    **Graphique :** Barplot (top 10 des paires de stations les plus fréquentées)\
-    **Variables :** Nom de la station de départ, Nom de la station d’arrivée, Nombre de trajets
 
-3.  Lien avec la météo
+**3.  Lien avec la météo**
 
 -   Comment la météo influence-t-elle l’usage des vélos ?
     (pluie, température, vent, etc…)\
-    **Graphique :** Lineplot ou scatterplot par variable météorologique\
-    **Variables :** Conditions météo, Nombre de trajet par jour
 
 -   Quel est l’impact des conditions météorologiques sur la durée moyenne des trajets ?\
-    **Graphique :** Lineplot ou scatterplot par variable météorologique\
-    **Variables :** Conditions météo, Durée moyenne des trajets
 
 -   En cas de météo extrême (fortes pluies ou froid extrême), est-ce que le volume de trajets diminue fortement ?\
-    **Graphique :** Boxplot (jours normaux vs météo extrême)\
-    **Variables :** Conditions météo, nombre de trajets
 
 -   Les membres abonnés utilisent-ils plus les vélos que les usagers occasionnels quand il fait mauvais ?\
-    **Graphique :** Lineplot avec comparaison entre les types d’utilisateur\
-    **Variables :** météo, nombre de trajet, type d’utilisateur
 
-4.  Question bonus
+**4.  Question bonus**
 
 -   Est ce qu’il est possible de voir une différence d’utilisation des vélos lors de la prise du Capitol le 6 janvier 2021?\
-    **Graphique :** Lineplot (date en abscisse, nombre de trajets en ordonnée, avec mise en évidence du 6 janvier 2021)\
-    **Variables :** Date de début du trajet, Nombre de trajets par jour
+
 
 ### Contraintes et limites :
 
