@@ -756,26 +756,6 @@ leaflet(top_depart_coords) %>%
   ) %>%
   addLegend("bottomright", colors = my_colors[1], labels = "Stations de départ", title = "Top 10")
 
-
-top_end_coords <- df %>%
-  filter(!is.na(start_station_name), end_station_name != "") %>%
-  count(end_station_name, end_lat, end_lng, sort = TRUE) %>%
-  slice_head(n = 10)
-
-leaflet(top_end_coords) %>%
-  addTiles() %>%
-  addCircleMarkers(
-    lng = ~end_lng,
-    lat = ~end_lat,
-    label = ~paste0(end_station_name, ": ", n, " trajets"),
-    radius = 6,
-    fillColor = my_colors[2],
-    color = "black",
-    fillOpacity = 0.7,
-    stroke = TRUE
-  ) %>%
-  addLegend("bottomright", colors = my_colors[2], labels = "Stations d'arrivées", title = "Top 10")
-
 ```
 
 **Interprétation** :
@@ -842,47 +822,6 @@ ggplot(df_heat_top_filtre, aes(x = heure_start, y = reorder(start_station_name, 
   scale_fill_viridis_c() +
   labs(title = "Stations de départ les plus actives \n dans la journée",
        x = "Heure", y = "Station", fill = "Nombre de début de trajets") +
-  theme_minimal()
-
-
-# Extract heure
-df$heure_end <- hour(ymd_hms(df$ended_at))
-
-# Agréger par heure et station de arrivée
-df_heat <- df %>%
-  group_by(end_station_name, heure_end) %>%
-  summarise(nb_trajets = n(), .groups = "drop")
-
-# TOP 20
-top_stations <- df_heat %>% 
-  group_by(end_station_name) %>% 
-  summarise(total = sum(nb_trajets)) %>% 
-  top_n(20, total) %>% pull(end_station_name)
-
-df_heat_top <- df_heat %>% filter(end_station_name %in% top_stations)
-
-# Suppression NA (les autres stations apres filtre)
-df_heat_top <- df_heat_top %>% filter(!is.na(end_station_name))
-
-# Calculer l'ordre des stations par popularité
-station_order <- df_heat_top %>%
-  group_by(end_station_name) %>%
-  summarise(total_trajets = sum(nb_trajets)) %>%
-  arrange(desc(total_trajets)) %>%
-  pull(end_station_name)
-
-df_heat_top <- df_heat_top %>%
-  mutate(end_station_name = factor(end_station_name, levels = station_order))
-
-df_heat_top_filtre <- df_heat_top %>%
-  filter(!(heure_end >= 0 & heure_end <= 5))
-
-# HEATMAP filtre sur 2 a 5h du matin
-ggplot(df_heat_top_filtre, aes(x = heure_end, y = reorder(end_station_name, desc(end_station_name)), fill = nb_trajets)) +
-  geom_tile() +
-  scale_fill_viridis_c() +
-  labs(title = "Stations d'arrivée les plus actives \n dans la journée",
-       x = "Heure", y = "Station", fill = "Nombre de fin de trajets") +
   theme_minimal()
 
 ```
@@ -974,84 +913,6 @@ map <- leaflet(station_activity) %>%
 map
 
 
-```
-
-
-```{r Q8_map_2}
-df_2024 <- df %>%
-  filter(year(ended_at) == 2024)
-
-# Calculer l'activité des stations (départs)
-station_activity <- df_2024 %>%
-  mutate(heure = hour(ended_at)) %>%
-  # Filtrer pour ne garder que les stations avec coordonnées valides
-  filter(!is.na(end_lat) & !is.na(end_lng)) %>%
-  group_by(end_station_name, end_lat, end_lng) %>%
-  summarise(
-    nb_trajets = n(),
-    # Heure de pointe du matin (6h-9h)
-    matin = sum(heure >= 6 & heure <= 10),
-    # Heure de pointe du soir (16h-19h)
-    soir = sum(heure >= 16 & heure <= 20),
-    # Milieu de journée (10h-15h)
-    journee = sum(heure >= 11 & heure <= 15),
-    .groups = "drop"
-  ) %>%
-  # Calculer quelle période a le plus de trajets
-  # Avec une condition supplémentaire pour "Matin et Soir"
-  mutate(
-    # Calculer la différence relative entre matin et soir
-    diff_matin_soir = abs(matin - soir) / pmax(matin, soir),
-    
-    peak_period = case_when(
-      # Si matin et soir sont proches (moins de 15% de différence) et plus grands que journée
-      diff_matin_soir <= 0.15 & matin > journee & soir > journee ~ "Matin et Soir",
-      matin > soir & matin > journee ~ "Matin (6h-10h)",
-      soir > matin & soir > journee ~ "Soir (16h-20h)",
-      journee > matin & journee > soir ~ "Journée (11h-15h)",
-      TRUE ~ "Équilibré"
-    )
-  ) %>%
-  # Filtrer pour garder les stations les plus actives (top 50)
-  top_n(50, nb_trajets)
-
-# Définir une palette de couleurs pour les périodes de pointe avec la nouvelle catégorie
-period_colors <- colorFactor(
-  palette = c("blue", "green", "red", "orange", "purple"),
-  domain = c("Matin (6h-10h)", "Journée (11h-15h)", "Soir (16h-20h)", "Matin et Soir", "Équilibré")
-)
-
-# Créer la carte
-map <- leaflet(station_activity) %>%
-  addTiles() %>%  # Ajouter la carte de base OpenStreetMap
-  addCircleMarkers(
-    ~end_lng, ~end_lat,
-    color = ~period_colors(peak_period),
-    radius = ~sqrt(nb_trajets)/10,  # Taille basée sur le nombre de trajets
-    fillOpacity = 0.7,
-    stroke = TRUE,
-    weight = 1,
-    popup = ~paste(
-      "<b>", end_station_name, "</b><br/>",
-      "Total trajets: ", nb_trajets, "<br/>",
-      "Pic d'activité: ", peak_period, "<br/>",
-      "Matin (6h-10h): ", matin, " trajets<br/>",
-      "Journée (11h-15h): ", journee, " trajets<br/>",
-      "Soir (16h-20h): ", soir, " trajets"
-    ),
-    # Option pour améliorer l'interaction
-    options = markerOptions(riseOnHover = TRUE)
-  ) %>%
-  addLegend(
-    position = "bottomright",
-    pal = period_colors,
-    values = ~peak_period,
-    title = "Pic d'activité",
-    opacity = 0.7
-  )
-
-# Afficher la carte
-map
 ```
 
 La carte des départs met en évidence la typologie fonctionnelle des quartiers :
