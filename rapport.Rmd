@@ -116,7 +116,7 @@ Avant de commencer l'analyse, nous nous posons plusieurs questions que l’on pe
 -   Combien de trajets sont effectués en moyenne par jour/mois ? 
 -   Quelle est la tendance générale de l’utilisation des vélos au cours de l’année ? Y a-t-il des pics saisonniers ?\
 -   Quelles sont les durées moyenne des trajets ? Varient-elles selon le jour de la semaine ou le type d'utilisateur ?\
--   Quel type de vélo (électrique, classique ou cargo) est le plus utilisé ? Varie-t-il en fonction du type d'utilisateur ? \
+-   Quelle est l'évolution de l'utilisation des différents types de vélos ? 
 -   Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?\
 -   En se focalisant sur les utilisateurs, y a-t-il des effets “heures de pointe” dans la journée ?\
 
@@ -222,7 +222,7 @@ avg_rides_per_day %>%
   ggplot(aes(x = day_of_week, y = avg_per_day)) +
   geom_col(fill = my_colors[1]) +
   labs(
-    title = "Nombre moyen de trajets par jour de la semaine",
+    title = "Nombre de trajets par jour de la semaine",
     x = "Jour de la semaine",
     y = "Nombre moyen de trajets"
   ) + 
@@ -439,7 +439,7 @@ Cela s'explique sûrement par l'utilisation différente des vélos : les gens le
 Concernant le type d'utilisateur, nos hypothèses étaient justes : les utilisateurs 'casual' se déplacent plus longtemps avec une moyenne de quasiement 30 min tandis que les utilisateurs 'members' utilisent les vélos pendant environ 12 minutes.
 Cela s'explique par le fait que les utilisateurs 'casual' font des balades, les utilisent pour visiter par exemple.
 
-### Question 4: Comment les différents types de vélos sont utilisés (type d''utilisateur, évolution...)
+### Question 4: Quelle est l'évolution de l'utilisation des différents types de vélos ? 
 
 **Quelle est l'évolution de l'usage des différents type de vélos ?**
 
@@ -474,80 +474,6 @@ Ensuite entre 2021 et 2024, le vélo classique a été largement le plus utilis�
 Ce graphique montre également que l'utilisation des vélos suit un cycle saisonnier, aspect qui sera détaillé dans une autre visualisation.
 Ces données suggèrent une modernisation de la flotte de Capital Bike Share, et une transition des utilisateurs vers des vélos plus confortables qui demandent moins d'efforts (électriques) ainsi que des vélos qui leur permettent plus de flexibilité en terme de localisation d'emprunt et de rendu (diminution des « docked »)
 
-On peut également s'interroger sur l'utilisation des différents types de vélos par les 2 types d'utilisateurs, y a t -il une différence ? 
-
-**Hypothèse** 
-Nous supposons que les utilisateurs 'casual' préfèrent les vélos électriques, puisque qu'ils les utilisent probablement pour se balader, pour visiter...
-
-
-**Graphique**
-```{r}
-
-df_prop <- df %>%
-  group_by(member_casual, rideable_type) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  group_by(member_casual) %>%
-  mutate(proportion = n / sum(n) * 100)
-
-
-ggplot(df_prop, aes(x = member_casual, y = proportion, fill = rideable_type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(
-    title = "Répartition des types de vélos par type d'utilisateur",
-    x = "Type d'utilisateur", y = "Proportion (%)", fill = "Type de vélo"
-  ) +
-  theme_minimal()
-
-df_prop <- df %>%
-  group_by(member_casual, rideable_type) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  group_by(member_casual) %>%
-  mutate(proportion = n / sum(n) * 100)
-
-ggplot(df_prop, aes(x = member_casual, y = proportion, fill = rideable_type)) +
-  geom_bar(stat = "identity") +
-  labs(
-    title = "Répartition des types de vélos par utilisateur",
-    x = "Type d'utilisateur",
-    y = "Proportion (%)",
-    fill = "Type de vélo"
-  ) +
-  theme_minimal()
-
-```
-
-**Interpétation**
-On peut voir que les utilisateurs 'membres' utilisent les vélos classiques et moins les "docked" comparé aux utilisateurs "casuals". 
-Cela peut être dû au fait que les docked existaient avant les classic et ne sont plus très présents, mais qu'en parallèle de ça il y a de plus en plus de trajets de members.
-
-**Graphique**
-
-```{r}
-
-df_evolution <- df %>%
-  mutate(month = floor_date(date, "month")) %>%  # ou "week" / "day"
-  group_by(month, member_casual) %>%
-  summarise(nb_trajets = n(), .groups = "drop")
-
-ggplot(df_evolution, aes(x = month, y = nb_trajets, color = member_casual)) +
-  geom_line(size = 1.2) +
-  scale_color_brewer(palette = "Set2")+
-  geom_point() +
-  labs(
-    title = "Évolution du nombre de trajets par type d'utilisateur",
-    x = "Date",
-    y = "Nombre de trajets",
-    color = "Type d'utilisateur"
-  ) +
-  theme_minimal()
-```
-
-**Interprétation**
-
-On peut voir sur le graphique, qu'il y a de plus en plus de trajets fait par des membres.
-Il y a donc probablement plus de trajets de membres avec des vélos classiques qu'avec des vélos docked puisqu'il n'y a quasiement plus de vélos docked tandis qu'il y a énormement de vélos classiques en circulation.
-On peut donc en conclure, que les différents types d'utilisateurs ne choississent pas sécifiquement le type de vélos qu'ils utilisent.
-Il n'y a pas vraiment de différence d'utilisation.
 
 ### Question 5 : Selon les saisons, la fréquence de cyclistes occasionnels change-t-elle comparé aux membres ?
 
@@ -876,7 +802,7 @@ station_activity <- df_2024 %>%
 
 # Définir une palette de couleurs pour les périodes de pointe avec la nouvelle catégorie
 period_colors <- colorFactor(
-  palette = c("blue", "green", "red", "orange", "purple"),
+  palette = c(my_colors[1], my_colors[2], my_colors[3], my_colors[4], my_colors[5]),
   domain = c("Matin (6h-10h)", "Journée (11h-15h)", "Soir (16h-20h)", "Matin et Soir", "Équilibré")
 )
 
@@ -1578,7 +1504,7 @@ df_meteo <- inner_join(df_quotidien, weather, by = c("date" = "datetime"))
 ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "black") +
-  labs(title = "Relation entre le nombre de trajets par jour et la température maximale",
+  labs(title = "Influence de la température sur le nombre de trajets",
        x = "Température maximale (°C)", y = "Nombre de trajets par jour") +
   theme_minimal()
 
@@ -1586,7 +1512,7 @@ ggplot(df_meteo, aes(x = temp, y = nb_trajets)) +
 ggplot(df_meteo, aes(x = precipcover, y = nb_trajets)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, color = "black") +
-  labs(title = "Relation entre le nombre de trajets par jour et les précipitations",
+  labs(title = "Influence des précipitations sur le nombre de trajets ",
        x = "Précipitations (mm)", y = "Nombre de trajets par jour") +
   theme_minimal()
 
@@ -1600,7 +1526,7 @@ La deuxième visualisation est elle aussi un nuage de points représentant le no
 ### Question 13 : Est ce que les durées de trajets sont influencés par la météo ? 
 
 **Hypothèse :**
-Nous nous intéressons maintenant aux facteurs météorologiques comme le vent, la couverture nuageuse, les précipitations... et sur leur impact sur les durées moyennes de trajets. Nous souhaitons voir si le mauvais temps défavorise l'utilisation des vélos. Nous supposons donc que la durée moyenne de trajet devrait être plus courte les jours de mauvais temps.
+Nous nous intéressons maintenant sur les mêmes facteurs météorologique mais cette fois sur leur impact sur les durées moyennes de trajets. Nous souhaitons voir si le mauvais temps défavorise l'utilisation des vélos. Nous supposons donc que la durée moyenne de trajet devrait être plus courte les jours de mauvais temps.
 
 
 ```{r}
@@ -1623,20 +1549,8 @@ merged %>%
   geom_point(alpha = 0.5) +
   geom_smooth(method = "loess", se = FALSE, color = "black") +
   labs(
-    title = "Durée moyenne des trajets selon la température",
+    title = "Influence de la température sur la durée des trajets",
     x = "Température moyenne (°C)",
-    y = "Durée moyenne (min)"
-  ) +
-  theme_minimal()
-
-
-merged %>%
-  ggplot(aes(x = cloudcover, y = mean_duration)) +
-  geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = "black", se = FALSE) +
-  labs(
-    title = "Durée moyenne selon la couverture nuageuse",
-    x = "Couverture nuageuse (%)",
     y = "Durée moyenne (min)"
   ) +
   theme_minimal()
@@ -1647,35 +1561,21 @@ merged %>%
   geom_point(alpha = 0.4) +
   geom_smooth(method = "loess", color = "black", se = FALSE) +
   labs(
-    title = "Durée moyenne selon les précipitations",
+    title = "Influence des précipitations sur la durée des trajets ",
     x = "Précipitations (mm)",
     y = "Durée moyenne (min)"
   ) +
   theme_minimal()
 
 
-merged %>%
-  ggplot(aes(x = windspeed, y = mean_duration)) +
-  geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", color = "black", se = FALSE) +
-  labs(
-    title = "Durée moyenne selon la vitesse du vent",
-    x = "Vitesse du vent",
-    y = "Durée moyenne (min)"
-  ) +
-  theme_minimal()
-
 
 ```
 **Interprétation** :
 
-La première visualisation met en relation la vitesse du vent et la durée moyenne des trajets afin d'observer si le vent a un impact sur l'utilisation des vélos des usagers. On observe que la majorité des trajets ont une durée moyenne comprise entre 0 et 60 minutes, quelle que soit la vitesse du vent. Il y a également quelques points extrêmes (outliers) où la durée des trajets est très longue, mais ces cas restent rares. Entre 0 et 20km/h on observe une légère augmentation de l'utilisation sûrement dûe au fait qu'il soit rare que le vent soit en dessous de 20 km/h. Après 20km/h on voit une très légère baisse qui décroit encore plus vers 35 km/h montrant que la durée d'utilisation des vélos est plus faibles. On peut donc dire que les utilisateurs ont tendnace à faire des trajets plus courts lorsque le vent est fort.
+La première visualisation met en relation la durée moyenne du trajet avec la température moyenne de la journée. On observe un pic de durée vers 22-23 degrés Celsius avce une durée moyenne comprise entre 15 minutes et 30 minutes environ. On observe une diminution importante quand la température est inférieure à 15 degré ou supérieure à 30 degrés. 
+On observe donc que la chaleur n'influençait pas beaucoup sur le nombre de trajets mais influe quand même sur la durée des trajets. 
 
-La deuxième visualisation met en relation la couverture nuageuse et la durée moyenne des trajets afin d'observer si les nuages ont un impact sur l'utilisation des vélos des usagers. Encore une fois la très grande majorité des points se situe sous les 60 minutes de durée moyenne, quel que soit le pourcentage de couverture nuageuse. La courbe de tendance bleue indique une légère hausse de la durée moyenne des trajets jusqu’à environ 25–30 % de couverture nuageuse, puis une faible diminution à mesure que la couverture nuageuse augmente. Aucun effet marqué ou extrême n’est observé concernant la couverture nuageuse : la dispersion des points reste assez constante sur toute la plage des valeurs. Quelques valeurs extrêmes (outliers) existent aussi pour des durées de trajet très longues, mais elles restent minoritaires.
-
-La troisième visualisation met en relation les précipitations et la durée moyenne des trajets afin d'observer si la neige a un impact sur l'utilisation des vélos des usagers. La grande majorité des observations se trouvent à 0 de précipitations, où la durée moyenne des trajets est très variable. Ceci peut s'expliquer parce que les utilisateurs ne souhaitent juste pas faire du vélos quand il pleut. 
-
-La dernière visualisation montre une hausse légère de la durée moyenne des trajets vers 20 km/h de vent. C'est assez minime il n'y a pas beaucoup d'influence du vent sur la durée moyenne. 
+La deuxième visualisation met en relation les précipitations et la durée moyenne des trajets afin d'observer si la neige a un impact sur l'utilisation des vélos des usagers. La grande majorité des observations se trouvent à 0 de précipitations, où la durée moyenne des trajets est très variable. Ceci peut s'expliquer parce que les utilisateurs ne souhaitent juste pas faire du vélos quand il pleut. Il n'y a pas du tout d'influence au niveau de la quantité de pluie. 
 
 
 ### Question 14
