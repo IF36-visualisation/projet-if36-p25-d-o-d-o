@@ -1684,19 +1684,17 @@ La dernière visualisation montre une hausse légère de la durée moyenne des t
 
 **Hypothèse** :
 
-On cherche maintenant à s'intéresser à des cas extrêmes de température pour essayer d'observer un potentiel changement dû à ceci. Ainsi, nous avons cherché 4 évènements inclus dans les dates de nos données où les températures ont été particulièrement basses et hautes pendant une longue durée.
-
+On cherche maintenant à s'intéresser à des cas extrêmes de température pour essayer d'observer un potentiel impact. Ainsi, nous avons cherché 4 évènements inclus dans les dates de nos données où les températures ont été particulièrement basses et hautes pendant une longue durée.
 En premier temps nous verrons l'impact de 2 évènements à température froide extrême, et ensuite 2 évènements à température chaude extrême.
 
 Pour les évènements froid, nous en avons choisi un en février 2021, et l'autre en décembre 2022:
-En février 2021, Dû à un anticyclone arctique qui a soudainement déplacé de l’air glacial vers le sud. Une vague de froid a débuté au Canada et s'est propagé rapidement sur le territoire américain, affectant particulièrement le Texas, un État généralement habitué à des températures plus chaudes.
-Cependant nous avons aussi pu observer une durée de 6 jours à Washington DC où les températures étaient nettement plus basse que les journées précédentes.
+En février 2021, Dû à un anticyclone arctique qui a soudainement déplacé de l’air glacial vers le sud. Une vague de froid a débuté au Canada et s'est propagé rapidement sur le territoire américain. À Washington DC,on observe une durée de 6 jours à Washington DC où les températures étaient nettement plus basse que les journées précédentes.
 Source : https://journals.ametsoc.org/view/journals/bams/103/12/BAMS-D-21-0266.1.xml
 
-En décembre 2022, autour de Noël, un vent froid a balayé la région Washington DC  entraînant des températures extrêmes en dessous de 0 en raison de fréquentes rafales de vent à environ 48km/h.
+En décembre 2022, autour de Noël, un vent froid a balayé Washington DC entraînant des températures extrêmes en dessous de 0.
 Source : https://www.weather.gov/mrx/December_2022_Record_Cold
 
-Comme on l'a observé dans la question précédente, la température a un effet sur l'utilisation des usagers, ainsi nous pensons que l'utilisation sera réduites lors de ces pics froid et chaud.
+Comme on l'a observé dans la question précédente, la température a un effet sur l'utilisation des usagers, ainsi nous pensons que l'utilisation sera réduite lors de ces pics froid et chaud.
 
 **Graphiques** :
 ```{r Q13 froid, echo=FALSE}
@@ -1721,7 +1719,7 @@ df_tempextreme_froid_fev21 <- filtrer_dates(period4semaines_tempextreme_froid_fe
 
 
 #Visualisation 1 temp extreme froide
-plotQ13_froid1 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajets)) +
+plotQ13_froid2 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajets)) +
   geom_col(aes(fill = ifelse(date %in% period_tempextreme_froid_dec22, "Période froide", "Période normale"))) +
   geom_smooth(data = df_tempextreme_froid_dec22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en décembre 2022",
@@ -1731,7 +1729,7 @@ plotQ13_froid1 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajet
   theme_minimal()
 
 #Visualisation 2 temp extreme froide
-plotQ13_froid2 <- ggplot(df_tempextreme_froid_fev21, aes(x = date, y = nb_trajets)) +
+plotQ13_froid1 <- ggplot(df_tempextreme_froid_fev21, aes(x = date, y = nb_trajets)) +
   geom_col(aes(fill = ifelse(date %in% period_tempextreme_froid_fev21, "Période froide", "Période normale"))) +
   geom_smooth(data = df_tempextreme_froid_fev21, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
   labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en février 2021",
@@ -1742,18 +1740,15 @@ plotQ13_froid2 <- ggplot(df_tempextreme_froid_fev21, aes(x = date, y = nb_trajet
 
 plotQ13_froid1
 plotQ13_froid2
-
 ```
 **Interprétation**
-La première visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en décembre 2022. Grâce à un barplot, on peut observer le nombre de trajet cumulé chaque jour ainsi que sa courbe de régression en rouge. La période de l'évènement est mis en valeur en colorant en bleu les barres la concernant. On voit une grosse chute d'utilisation par 4 si l'on compare avec les jours précédent. Cependant on remarque aussi que les jours juste avant et après l 'évènement suivent la même tendance. Ceci peut s'expliquer parce que les températures du 22 décembre (veille de l'évènement choisi) a déja atteint ...°C, une différence de ... °C avec le jour d'après.
-
-La seconde visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en février 2021. On peut voir que les deux premiers jours n'ont pas tellement d'impact sur l'utilisation des vélos, mais à partir du 3ème. On voit une réelle chute pendant 3 jours, qui ensuite remonte le dernier jour.
+Les deux visualisations sont faites sur 14 jours précédant et 14 jours suivant les périodes de températures extrêmes. Grâce à un barplot, on peut observer le nombre de trajet cumulé chaque jour ainsi que sa courbe de régression en rouge. La période de l'évènement est mis en valeur en colorant en bleu les barres la concernant. 
+La première visualisation sur la période février 2021, on peut voir que les deux premiers jours n'ont pas tellement d'impact sur l'utilisation des vélos, mais à partir du 3ème. On voit une réelle chute pendant 3 jours, qui ensuite remonte le dernier jour.
+Pour le second graphique sur la période en décembre 2022, on voit une grosse chute d'utilisation par 4 si l'on compare avec les jours précédent. Cependant on remarque aussi que les jours juste avant et après l 'évènement suivent la même tendance. Ceci peut s'expliquer parce que les températures du 22 décembre (veille de l'évènement choisi) ont déja atteint 5°C.
 
 **Hypothèse**
 
 Nous cherchons maintenant à voir l'impact que ces températures extrêmes chaudes auraient pu avoir sur l'utilisation des vélos.
-
-En second temps nous verrons l'impact de 2 évènements à température chaudes extrêmes.
 
 Pour les évènements chaud, nous en avons choisi un en mai 2022, et l'autre en juillet 2024:
 En mai 2022, Washington D.C. a connu une vague de chaleur marquante, enregistrant des températures exceptionnellement élevées pour cette période de l'année. Selon les prévisions de la National Weather Service, les températures ont commencé à grimper rapidement, atteignant des niveaux rarement observés si tôt dans la saison.
@@ -1809,10 +1804,8 @@ plotQ13_chaud1
 plotQ13_chaud2
 ```
 **Interprétation**
+Pour les deux visualisations (mai 2022 / juillet 2024), à l'inverse des périodes froides, on voit une réaction totalement inverse. Les utilisateurs ne diminuent pas du tout et reste les mêmes, malgré des grosses chaleurs.
 
-La première visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en mai 2022. Grâce à un barplot, on peut observer le nombre de trajet cumulé chaque jour ainsi que sa courbe de régression en rouge. La période de l'évènement est mis en valeur en colorant en bleu les barres la concernant. A l'inverse des périodes froides, on voit une réaction totalement inverse. Les utilisateurs ne diminuent pas du tout et reste les mêmes, malgré des chaleurs avoisinant les ...°C.
-
-La seconde visualisation est faite sur 14 jours précédant et 14 jours suivant l'évènement en juillet 2024. 
 
 ### Question 15 : Les utilisateurs membres utilisent-ils plus les vélos par mauvais temps ?
 
