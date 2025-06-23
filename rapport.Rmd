@@ -1622,7 +1622,7 @@ df_tempextreme_froid_fev21 <- filtrer_dates(period4semaines_tempextreme_froid_fe
 plotQ13_froid2 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajets)) +
   geom_col(aes(fill = ifelse(date %in% period_tempextreme_froid_dec22, "Période froide", "Période normale"))) +
   geom_smooth(data = df_tempextreme_froid_dec22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
-  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en décembre 2022",
+  labs(title = "Baisse des trajets pendant les grands froids décembre 2022",
     x = "Date", y = "Nombre de trajets par jour") +
   scale_fill_manual(values = c("Période froide" = my_colors[1], "Période normale" = "grey"), name = NULL) +
   scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
@@ -1632,7 +1632,7 @@ plotQ13_froid2 <- ggplot(df_tempextreme_froid_dec22, aes(x = date, y = nb_trajet
 plotQ13_froid1 <- ggplot(df_tempextreme_froid_fev21, aes(x = date, y = nb_trajets)) +
   geom_col(aes(fill = ifelse(date %in% period_tempextreme_froid_fev21, "Période froide", "Période normale"))) +
   geom_smooth(data = df_tempextreme_froid_fev21, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
-  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes froides en février 2021",
+  labs(title = "Baisse des trajets pendant les grands froids février 2021",
     x = "Date", y = "Nombre de trajets par jour") +
   scale_fill_manual(values = c("Période froide" = my_colors[1], "Période normale" = "grey"), name = NULL) +
   scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
@@ -1682,7 +1682,7 @@ df_tempextreme_chaud_july24 <- filtrer_dates(period4semaines_tempextreme_chaud_j
 plotQ13_chaud1 <- ggplot(df_tempextreme_chaud_may22, aes(x = date, y = nb_trajets)) +
   geom_col(aes(fill = ifelse(date %in% period_tempextreme_chaud_may22, "Période chaude", "Période normale"))) +
   geom_smooth(data = df_tempextreme_chaud_may22, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
-  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes chaudes en mai 2022",
+  labs(title = "Stabilité des trajets pendant les fortes chaleurs mai 2022",
     x = "Date", y = "Nombre de trajets par jour") +
   scale_fill_manual(values = c("Période chaude" = my_colors[1], "Période normale" = "grey"), name = NULL) +
   scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
@@ -1693,7 +1693,7 @@ plotQ13_chaud1 <- ggplot(df_tempextreme_chaud_may22, aes(x = date, y = nb_trajet
 plotQ13_chaud2 <- ggplot(df_tempextreme_chaud_july24, aes(x = date, y = nb_trajets)) +
   geom_col(aes(fill = ifelse(date %in% period_tempextreme_chaud_july24, "Période chaude", "Période normale"))) +
   geom_smooth(data = df_tempextreme_chaud_july24, method = "loess", se = FALSE, aes(color = "Courbe moyenne")) +
-  labs(title = "Observation des nombres de trajets par jour lors de températures extrêmes chaudes en juillet 2024",
+  labs(title = "Stabilité des trajets pendant les fortes chaleurs juillet 2024",
     x = "Date", y = "Nombre de trajets par jour") +
   scale_fill_manual(values = c("Période chaude" = my_colors[1], "Période normale" = "grey"), name = NULL) +
   scale_color_manual(values = c("Courbe moyenne" = my_colors[2]), name = NULL) +
