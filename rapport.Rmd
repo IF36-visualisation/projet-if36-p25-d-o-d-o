@@ -11,7 +11,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message= FALSE)
 ```
 
 # Analyse de l’utilisation des vélos libre-service à Washington
@@ -168,7 +168,7 @@ update_geom_defaults("line", list(color = my_colors[2]))
 update_geom_defaults("bar", list(fill = my_colors[3]))
 ```
 
-```{r}
+```{r Importation_Data, echo=FALSE, include=FALSE}
 #importation du jeu de données
 df <- read_csv("data/daily_rent_detail.csv")
 weather <- read_csv("data/weather.csv")
@@ -307,7 +307,7 @@ En premier lieu, une observation intéressante à faire est d’observer la tend
 
 **Graphique** :
 
-```{r message=false}
+```{r message=FALSE}
 #Préparation des données
 # Nombre trajets par semaine
 df$date <- as.Date(df$started_at)
@@ -1005,7 +1005,7 @@ top_routes <- df %>%
 # 2. Créer le barplot
 plot_top_routes <- ggplot(top_routes, aes(x = reorder(trajet_court, nombre_trajets), 
                                          y = nombre_trajets)) +
-  geom_col(fill = my_color[1], alpha = 0.8) +
+  geom_col(fill = my_colors[1], alpha = 0.8) +
   
   # Centrer les nombres dans les barres
   geom_text(aes(label = scales::comma(nombre_trajets), 
@@ -1368,7 +1368,7 @@ Comme on l'a observé dans la question précédente, la température a un effet 
 
 **Graphiques** :
 
-```{r Q13 froid, echo=FALSE message=false}
+```{r Q13 froid, echo=FALSE ,message=FALSE}
 filtrer_dates <- function(dates) {
   df_meteo %>%
     filter(date %in% ymd(dates))
@@ -1441,7 +1441,7 @@ On peut supposer que le même effet de baisse d'utilisation des vélos aura lieu
 
 **Graphiques :**
 
-```{r Q13 chaud, echo=FALSE message=False}
+```{r Q13 chaud, echo=FALSE, message=FALSE}
 filtrer_dates <- function(dates) {
   df_meteo %>%
     filter(date %in% ymd(dates))
@@ -1620,9 +1620,9 @@ date_capitole <- "2021-01-06"
 date_reference <- "2021-01-13"  
 
 # Fonction simplifiée pour extraire les données essentielles
-analyser_journee <- function(date) {
+analyser_journee <- function(dateeee) {
   df %>%
-    filter(as.Date(started_at) == as.Date(date)) %>%
+    filter(as.Date(started_at) == as.Date(dateeee)) %>%
     mutate(heure_minute = hour(started_at) + minute(started_at)/60) %>%
     filter(!is.na(start_lat), !is.na(start_lng), !is.na(start_station_name),
            heure_minute >= 13.2, heure_minute < 18) %>%  # Période critique uniquement
